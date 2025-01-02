@@ -1,8 +1,12 @@
 {
-  "name": "vibo",
-  "packageManager": "yarn@4.3.1",
+  "name": "fibo",
+  "packageManager": "yarn@4.5.3",
   "private": true,
+  "scripts": {
+    "test": "cd packages/test && yarn start"
+  },
   "workspaces": [
+    "base",
     "packages/*"
   ]
 }

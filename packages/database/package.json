@@ -1,0 +1,11 @@
+{
+  "name": "fibo-database",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "dependencies": {
+    "fibo-common": "workspace:^"
+  },
+  "packageManager": "yarn@4.5.3"
+}

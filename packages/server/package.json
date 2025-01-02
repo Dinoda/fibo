@@ -1,0 +1,12 @@
+{
+  "name": "fibo-server",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "fibo-common": "workspace:^"
+  },
+  "packageManager": "yarn@4.3.1"
+}

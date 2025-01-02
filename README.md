@@ -1,1 +1,5 @@
-# vibo
+# fibo
+
+FIBo
+
+Framework vIsion BOard

@@ -1,0 +1,14 @@
+{
+  "name": "fibo-test",
+  "type": "module",
+  "scripts": {
+    "start": "yarn node index.js"
+  },
+  "dependencies": {
+    "fibo-database-mariadb": "workspace:^",
+    "fibo-logging": "workspace:^",
+    "fibo-server": "workspace:^",
+    "fibo-setup": "workspace:^"
+  },
+  "packageManager": "yarn@4.5.3"
+}

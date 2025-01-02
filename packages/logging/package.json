@@ -1,0 +1,13 @@
+{
+  "name": "fibo-logging",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "dependencies": {
+    "express-winston": "^4.2.0",
+    "winston": "^3.17.0",
+    "winston-daily-rotate-file": "^5.0.0"
+  },
+  "packageManager": "yarn@4.3.1"
+}

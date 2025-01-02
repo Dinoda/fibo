@@ -1,0 +1,8 @@
+{
+  "name": "fibo-common",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "packageManager": "yarn@4.3.1"
+}

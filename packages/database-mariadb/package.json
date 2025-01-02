@@ -1,0 +1,12 @@
+{
+  "name": "fibo-database-mariadb",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "dependencies": {
+    "fibo-database": "workspace:^",
+    "mariadb": "^3.4.0"
+  },
+  "packageManager": "yarn@4.5.3"
+}
