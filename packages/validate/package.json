@@ -1,0 +1,8 @@
+{
+  "name": "fibo-validate",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "packageManager": "yarn@4.5.3"
+}
