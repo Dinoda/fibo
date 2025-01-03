@@ -89,10 +89,6 @@ export default class Validator {
         this.validators[key] = param;
       } else if (v.object(param)) {
         this.validators[key] = this.subValidator(key, param);
-        this.validators[key] = new Validator(param, {
-          ...this.options,
-          depth: this.options.depth + 1
-        });
       } else if (v.string(param)) {
         this.validators[key] = this.resolveString(param);
       } else {

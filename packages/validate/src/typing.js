@@ -43,7 +43,7 @@ export const required = elem => {
  * @return boolean
  */
 export const nullable = elem => {
-  return elem == null || elem == "";
+  return null == elem || "" == elem;
 };
 
 /**
