@@ -42,6 +42,31 @@ const o = {
 console.log(v.validate(o));
 console.log(v.detail(o));
 
+const urlRegex = /:[\w\d_]+/g;
+
+function initUrls(urls) {
+  for (const key in urls) {
+    const url = urls[key];
+
+    if (typeof url == "string") {
+      const matches = url.match(urlRegex);
+
+      urls[key] = {
+        base: url,
+        params: matches ? matches.map(m => m.slice(1)) : []
+      };
+      console.log(matches);
+    }
+
+    console.log(urls);
+  }
+}
+initUrls({
+  get: "/api/doc",
+  getOne: "/api/doc/:id",
+  create: "/api/doc",
+  update: "/api/doc/:id/:name/:name_second"
+});
 /*
 let a = { a: "b", c: "d" };
 console.log(a);
