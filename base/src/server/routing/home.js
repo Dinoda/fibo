@@ -1,5 +1,6 @@
 import { createRouter } from "fibo-server";
-import { get } from '../resolver/home.js';
+import { get, getOne, getMeta, post } from "../resolver/home.js";
+import express from "express";
 
 const router = createRouter({
   middlewares: [
@@ -7,6 +8,13 @@ const router = createRouter({
   ]
 });
 
-router.route("/api").get(get);
+router.route("/api/work/meta").get(getMeta);
+
+router
+  .route("/api/work")
+  .get(get)
+  .post(express.json(), post);
+
+router.route("/api/work/:id").get(getOne);
 
 export default router;

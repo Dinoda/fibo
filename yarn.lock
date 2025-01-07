@@ -508,7 +508,11 @@ __metadata:
     dotenv: "npm:^16.4.7"
     esbuild: "npm:^0.24.2"
     esbuild-sass-plugin: "npm:^3.3.1"
+    express: "npm:^4.21.2"
     fibo-browser: "workspace:^"
+    fibo-browser-store: "workspace:^"
+    fibo-database-mariadb: "workspace:^"
+    fibo-datasheets: "workspace:^"
     fibo-logging: "workspace:^"
     fibo-server: "workspace:^"
     fibo-setup: "workspace:^"
@@ -1118,7 +1122,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"fibo-datasheets@workspace:packages/datasheets":
+"fibo-datasheets@workspace:^, fibo-datasheets@workspace:packages/datasheets":
   version: 0.0.0-use.local
   resolution: "fibo-datasheets@workspace:packages/datasheets"
   dependencies:
@@ -1178,6 +1182,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "fibo-test@workspace:packages/test"
   dependencies:
+    fibo-browser: "workspace:^"
+    fibo-browser-store: "workspace:^"
     fibo-database-mariadb: "workspace:^"
     fibo-logging: "workspace:^"
     fibo-server: "workspace:^"
@@ -1247,6 +1253,12 @@ __metadata:
   checksum: 10c0/028f1d41000553fcfa6c4bb5c372963bf3d9bf0b1f25a87d1a6253014343fb69dfb1b42d9625d7cf44c8ba429940f3d0ff718b62105d4d4a4f6ef8ca0a53faa2
   languageName: node
   linkType: hard
+
+"form@workspace:packages/form":
+  version: 0.0.0-use.local
+  resolution: "form@workspace:packages/form"
+  languageName: unknown
+  linkType: soft
 
 "forwarded@npm:0.2.0":
   version: 0.2.0

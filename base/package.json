@@ -10,7 +10,11 @@
     "dotenv": "^16.4.7",
     "esbuild": "^0.24.2",
     "esbuild-sass-plugin": "^3.3.1",
+    "express": "^4.21.2",
     "fibo-browser": "workspace:^",
+    "fibo-browser-store": "workspace:^",
+    "fibo-database-mariadb": "workspace:^",
+    "fibo-datasheets": "workspace:^",
     "fibo-logging": "workspace:^",
     "fibo-server": "workspace:^",
     "fibo-setup": "workspace:^"

@@ -1,6 +1,9 @@
 import Storage from "./Storage.js";
 
 export default class Store {
+  /**
+   * @param init An object with a "key/value" corresponding to "storage name/storage options" (see Storage for options)
+   */
   constructor(init) {
     this.storages = {};
 
@@ -9,6 +12,10 @@ export default class Store {
     }
 
     this.current = null;
+  }
+
+  getStorage(name) {
+    return this.storages[name];
   }
 
   setStorage(name, options) {

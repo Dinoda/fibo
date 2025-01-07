@@ -1,6 +1,9 @@
 //import "./src/server.js";
 //import "./src/database.js";
+import { Listenable } from "fibo-browser";
 import Validator from "fibo-validate";
+
+import Storage from "fibo-browser-store";
 
 const v = new Validator(
   {
@@ -67,6 +70,21 @@ initUrls({
   create: "/api/doc",
   update: "/api/doc/:id/:name/:name_second"
 });
+
+const l = new Listenable();
+
+const f = () => {
+  console.log("Hell yeah!");
+};
+
+l.addListener("reset", f);
+
+l.trigger("reset");
+
+new Storage("work", {
+  urls: { get: "/api/work" }
+});
+
 /*
 let a = { a: "b", c: "d" };
 console.log(a);

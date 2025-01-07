@@ -1,0 +1,8 @@
+{
+  "name": "form",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "packageManager": "yarn@4.6.0"
+}

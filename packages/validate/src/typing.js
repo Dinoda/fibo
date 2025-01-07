@@ -88,6 +88,10 @@ export const object = elem => {
   return typeof elem === "object" && !Array.isArray(elem);
 };
 
+export const array = elem => {
+  return Array.isArray(elem);
+};
+
 /**
  * A validator.
  *
@@ -132,4 +136,22 @@ export const boolean = elem => {
 
 export const callable = elem => {
   return typeof elem == "function";
+};
+
+export const empty = elem => {
+  if (array(elem) && elem.length == 0) {
+    return true;
+  }
+
+  if (object(elem)) {
+    for (const k in elem) {
+      if (Object.hasOwn(elem, k)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  return false;
 };

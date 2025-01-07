@@ -1,0 +1,12 @@
+{
+  "name": "fibo-datasheets",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "dependencies": {
+    "fibo-browser": "workspace:^",
+    "fibo-browser-store": "workspace:^"
+  },
+  "packageManager": "yarn@4.5.3"
+}

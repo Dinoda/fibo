@@ -21,7 +21,7 @@ const createExpressApp = (options = {}) => {
   }
 
   for (const rtr of ensureArray(options.routers)) {
-    app.use(rtr);
+    app.use("", rtr);
   }
 
   for (const eh of ensureArray(options.errorHandlers)) {

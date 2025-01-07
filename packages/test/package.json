@@ -5,6 +5,8 @@
     "start": "yarn node index.js"
   },
   "dependencies": {
+    "fibo-browser": "workspace:^",
+    "fibo-browser-store": "workspace:^",
     "fibo-database-mariadb": "workspace:^",
     "fibo-logging": "workspace:^",
     "fibo-server": "workspace:^",
