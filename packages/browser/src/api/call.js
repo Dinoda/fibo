@@ -17,16 +17,21 @@
 const call = (url, method = "GET", data = null, options = {}, cb = null) => {
   if (typeof options == "function") {
     cb = options;
-    options = null;
+    options = {};
   }
 
-  const pr = fetch(url, {
-    method: method.toUpperCase(),
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(data)
-  });
+  options.method = method.toUpperCase();
+
+  switch (options.method) {
+    case "POST":
+      options.headers = {
+        "Content-Type": "application/json"
+      };
+      options.body = JSON.stringify(data);
+      break;
+  }
+
+  const pr = fetch(url, options);
 
   if (cb) {
     pr.then(d => {

@@ -2,7 +2,8 @@
   "name": "fibo-datasheets",
   "type": "module",
   "exports": {
-    ".": "./src/index.js"
+    ".": "./src/index.js",
+    "./scss": "./src/index.scss"
   },
   "dependencies": {
     "fibo-browser": "workspace:^",

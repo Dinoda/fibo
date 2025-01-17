@@ -12,6 +12,8 @@ export default class TableBody extends Component {
   setData(dtInterface) {
     this.data = dtInterface;
 
+    this.editable = this.data.isEditable();
+
     this.display();
   }
 

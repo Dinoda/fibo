@@ -3,6 +3,7 @@ import { Component } from "fibo-browser";
 import Datasheets from "fibo-datasheets";
 import Storage from "fibo-browser-store";
 
+import "fibo-datasheets/scss";
 import "./Content.scss";
 
 export default class Content extends Component {

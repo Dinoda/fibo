@@ -1,5 +1,11 @@
 import { createRouter } from "fibo-server";
-import { get, getOne, getMeta, post } from "../resolver/home.js";
+import {
+  get,
+  getOne,
+  getMeta,
+  post,
+  postUpdate as update
+} from "../resolver/home.js";
 import express from "express";
 
 const router = createRouter({
@@ -15,6 +21,8 @@ router
   .get(get)
   .post(express.json(), post);
 
-router.route("/api/work/:id").get(getOne);
-
+router
+  .route("/api/work/:id")
+  .get(getOne)
+  .post(express.json(), update);
 export default router;

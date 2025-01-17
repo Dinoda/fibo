@@ -1,0 +1,21 @@
+div.datasheet {
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+    td,
+    th {
+      padding: 0.4rem;
+      border: 1px solid black;
+    }
+    thead {
+      background-color: #faf;
+    }
+    tbody {
+      tr {
+        &:nth-child(even) {
+          background-color: #ddd;
+        }
+      }
+    }
+  }
+}
