@@ -4,10 +4,14 @@ import Selector from "./Selector.js";
 import Table from "./Table.js";
 import DataInterface from "./DataInterface.js";
 
+let id = 0;
+
 export default class Datasheets extends Component {
   constructor(stores, options = {}) {
     super("div", "datasheet");
 
+    this.id = id++;
+    this.storageName = "datasheet-storage-" + this.id;
     this.data = {};
     this.current = null;
     this.stores = stores;
@@ -20,8 +24,20 @@ export default class Datasheets extends Component {
     this.appendNewComponent("table", new Table());
 
     this.__selector.on("change", () => {
-      this.change(this.__selector.__.value);
+      const vl = this.__selector.getDOM().value;
+      this.change(vl);
+
+      sessionStorage.setItem(this.storageName, vl);
     });
+
+    setTimeout(() => {
+      const stValue = sessionStorage.getItem(this.storageName);
+
+      if (stValue) {
+        this.__selector.setValue(stValue);
+        this.change(stValue);
+      }
+    }, 0);
   }
 
   getSelections(options) {

@@ -4,6 +4,7 @@ import Datasheets from "fibo-datasheets";
 import Storage from "fibo-browser-store";
 
 import "fibo-datasheets/scss";
+import "fibo-browser/dialog-scss";
 import "./Content.scss";
 
 export default class Content extends Component {
@@ -25,7 +26,8 @@ export default class Content extends Component {
             get: "/api/work",
             meta: "/api/work/meta",
             create: "/api/work",
-            update: "/api/work/:id"
+            update: "/api/work/:id",
+            delete: "/api/work/:id"
           }
         })
       },

@@ -9,9 +9,13 @@ export default class Component {
    * @param cls The class (className) of the Component
    */
   constructor(tag = undefined, cls = "") {
-    if (tag) {
+    if (tag instanceof Element) {
+      this.__ = tag;
+    } else if (tag) {
       this.__ = document.createElement(tag);
+    }
 
+    if (this.__ && cls) {
       this.__.className = cls;
     }
   }

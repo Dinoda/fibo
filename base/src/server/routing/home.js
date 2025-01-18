@@ -4,7 +4,8 @@ import {
   getOne,
   getMeta,
   post,
-  postUpdate as update
+  postUpdate as update,
+  remove
 } from "../resolver/home.js";
 import express from "express";
 
@@ -22,7 +23,9 @@ router
   .post(express.json(), post);
 
 router
-  .route("/api/work/:id")
+  .route("/api/work/:id(\\d+)")
   .get(getOne)
-  .post(express.json(), update);
+  .post(express.json(), update)
+  .delete(remove);
+
 export default router;

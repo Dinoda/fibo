@@ -6,6 +6,8 @@ const INSERT =
 const UPDATE =
   "UPDATE work SET name = ?, description = ?, initialURL = ? WHERE id = ?";
 
+const DELETE = "DELETE FROM work WHERE id = ?";
+
 export const workModel = {
   id: {
     validator: "integer",
@@ -44,4 +46,14 @@ export const workUpdate = async data => {
   ]);
 
   return data;
+};
+
+export const workDelete = async id => {
+  const result = await db.query(DELETE, [id]);
+
+  if (result.affectedRows == 0) {
+    throw new Error("No row has been removed");
+  }
+
+  return result.affectedRows > 0;
 };

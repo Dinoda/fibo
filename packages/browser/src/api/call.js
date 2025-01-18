@@ -31,6 +31,7 @@ const call = (url, method = "GET", data = null, options = {}, cb = null) => {
       break;
   }
 
+  console.log("Fetching...");
   const pr = fetch(url, options);
 
   if (cb) {

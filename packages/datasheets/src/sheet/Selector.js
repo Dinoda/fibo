@@ -29,10 +29,12 @@ export default class Selector extends Component {
 
     super(style);
 
-    console.log(options);
-    console.log(style);
     for (const elem of options[style](selections)) {
       this.append(elem);
     }
+  }
+
+  setValue(value) {
+    this.getDOM().value = value;
   }
 }

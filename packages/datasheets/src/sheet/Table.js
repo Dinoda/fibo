@@ -1,7 +1,5 @@
 import { Component } from "fibo-browser";
 
-import RowForm from "./RowForm.js";
-
 import TableHead from "./table/Head.js";
 import TableBody from "./table/Body.js";
 

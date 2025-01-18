@@ -53,16 +53,22 @@ export default class DataManager {
     if (this.options?.meta) {
       this.setMeta(this.options.meta);
     } else if (this.urls.meta) {
-      call(resolveUrl(this.urls.meta), "GET").then(meta => {
-        this.setMeta(meta);
-      });
+      this.runningCallMetadata = call(resolveUrl(this.urls.meta), "GET").then(
+        meta => {
+          this.setMeta(meta);
+        }
+      );
     }
   }
 
   get() {
     this.runningCall = call(resolveUrl(this.urls.get), "GET").then(data => {
       this.setData(data);
+
+      return data;
     });
+
+    return this.runningCall;
   }
 
   getOne(idx, datum) {
@@ -72,6 +78,8 @@ export default class DataManager {
         index: idx,
         data
       });
+
+      return data;
     });
   }
 
@@ -94,17 +102,23 @@ export default class DataManager {
         index: idx,
         data
       });
+
+      return data;
     });
   }
 
   update(idx, datum) {
-    return call(resolveUrl(this.urls.update, datum), "POST").then(data => {
-      this.data[idx] = data;
-      this.storage.trigger("update", {
-        index: idx,
-        data
-      });
-    });
+    return call(resolveUrl(this.urls.update, datum), "POST", datum).then(
+      data => {
+        this.data[idx] = data;
+        this.storage.trigger("update", {
+          index: idx,
+          data
+        });
+
+        return data;
+      }
+    );
   }
 
   delete(idx, datum) {
@@ -127,7 +141,11 @@ export default class DataManager {
     return this.data;
   }
 
-  getMeta() {
+  async getMeta() {
+    if (this.runningCallMetadata) {
+      await this.runningCallMetadata;
+    }
+
     return this.meta;
   }
 

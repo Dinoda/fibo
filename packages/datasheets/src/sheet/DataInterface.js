@@ -37,44 +37,35 @@ export default class DataInterface {
     this.storage = storage;
     this.name = this.storage.getName();
 
-    this.storageMeta = this.storage.getMeta();
-    this.keys = getKeys(this.storageMeta);
-    this.formType = getFormTypes(this.storageMeta);
+    this.loading = Promise.all([
+      this.storage.getMeta(),
+      this.storage.getData()
+    ]).then(([meta, data]) => {
+      this.storageMeta = meta;
+      this.data = data;
 
-    this.createCall = this.storage.data.creatable()
-      ? data => {
-          this.storage.data.create(data);
-        }
-      : null;
+      this.keys = getKeys(this.storageMeta);
+      this.formType = getFormTypes(this.storageMeta);
 
-    this.updateCall = this.storage.data.updatable()
-      ? (idx, data) => {
-          this.storage.data.update(idx, data);
-        }
-      : null;
+      if (!this.keys) {
+        this.keys = getKeysFromData(this.data);
+      }
 
-    this.deleteCall = this.storage.data.deletable()
-      ? (idx, data) => {
-          this.storage.data.delete(idx, data);
-        }
-      : null;
-
-    this.load();
+      this.loading = null;
+    });
   }
 
   load() {
-    this.loading = new Promise((res, rej) => {
-      this.storage.getData().then(data => {
-        this.data = data;
+    if (!this.loading) {
+      this.loading = new Promise((res, rej) => {
+        this.storage.getData().then(data => {
+          this.data = data;
 
-        if (!this.keys) {
-          this.keys = getKeysFromData(this.data);
-        }
-
-        this.loading = null;
-        res(this.data);
+          this.loading = null;
+          res(this.data);
+        });
       });
-    });
+    }
 
     return this.loading;
   }
@@ -103,33 +94,15 @@ export default class DataInterface {
     return this.keys;
   }
 
-  create() {
-    if (!this.storage.data.creatable()) {
-      return null;
-    }
-
-    return data => {
-      this.storage.data.create(data);
-    };
+  create(data) {
+    return this.storage.data.create(data);
   }
 
-  update() {
-    if (!this.storage.data.updatable()) {
-      return null;
-    }
-
-    return (form, data) => {
-      this.storage.data.update(form.idx, data);
-    };
+  update(index, data) {
+    return this.storage.data.update(index, data);
   }
 
-  delete() {
-    if (!this.storage.data.deletable()) {
-      return null;
-    }
-
-    return (idx, data) => {
-      this.storage.data.delete(idx, data);
-    };
+  delete(idx, data) {
+    return this.storage.data.delete(idx, data);
   }
 }

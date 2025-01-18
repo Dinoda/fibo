@@ -18,6 +18,8 @@ export default class TableHead extends Component {
         c.text = k;
         this.__row.append(c);
       }
+
+      this.__row.appendNewComponent("action", "th");
     });
   }
 }

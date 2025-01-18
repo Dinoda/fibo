@@ -43,13 +43,11 @@ export function initUrls(urls) {
 }
 
 export function resolveUrl(url, data) {
-  console.log(url, data);
   let res = url.base;
 
   for (const p of url.params) {
     res = res.replace(":" + p, data[p]);
   }
-  console.log(res);
 
   return res;
 }
