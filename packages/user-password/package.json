@@ -1,0 +1,12 @@
+{
+  "name": "fibo-user-password",
+  "type": "module",
+  "packageManager": "yarn@4.7.0",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "fibo-user": "workspace:^"
+  }
+}

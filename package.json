@@ -1,15 +1,18 @@
 {
   "name": "fibo",
-  "packageManager": "yarn@4.6.0",
+  "packageManager": "yarn@4.7.0",
   "private": true,
   "scripts": {
-    "dev": "ENV=dev yarn node --watch index.js",
-    "prod": "ENV=prod yarn node index.js",
-    "start": "yarn node index.js",
+    "dev": "cd base && yarn dev",
+    "prod": "cd base && yarn prod",
+    "start": "cd base && yarn start",
     "test": "cd packages/test && yarn start"
   },
   "workspaces": [
     "base",
     "packages/*"
-  ]
+  ],
+  "devDependencies": {
+    "prettier": "3.5.3"
+  }
 }

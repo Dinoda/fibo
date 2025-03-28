@@ -9,6 +9,7 @@
     "fibo-logging": "workspace:^",
     "fibo-server": "workspace:^",
     "fibo-setup": "workspace:^",
+    "fibo-user": "workspace:^",
     "fibo-validate": "workspace:^"
   },
   "packageManager": "yarn@4.5.3"

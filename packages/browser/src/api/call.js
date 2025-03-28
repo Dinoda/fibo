@@ -1,4 +1,4 @@
-import progressCall from "./progressCall.js";
+//import progressCall from "./progressCall.js";
 
 /**
  * @param url The url of the call

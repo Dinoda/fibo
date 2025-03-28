@@ -1,77 +1,57 @@
 //import "./src/server.js";
 //import "./src/database.js";
-import Validator from "fibo-validate";
+//import "./src/validation.js";
+//import "./src/user.js";
 
-const v = new Validator(
-  {
-    type: "!string",
-    range: "range",
-    null: "boolean",
-    key: "boolean",
-    auto: "boolean",
-    unique: "boolean",
-    references: {
-      model: "!string",
-      field: "!string"
-    }
-  },
-  {
-    maxDepth: 1,
-    children: {
-      references: {
-        stupidOption: true
-      }
-    }
-  }
-);
 
-console.log("Created");
-console.log(v);
-console.log("Validation");
 
-const o = {
-  type: "integer",
-  key: true,
-  auto: true,
-  references: {
-    model: "a",
-    field: "b"
-  }
+
+
+/*
+import timing from "./src/testing/timing.js";
+
+const createRegisterFields = (fields, id) => {
+	return fields.reduce((res, fld) => {
+		if (fld != id) {
+			res.push(fld);
+		}
+
+		return res;
+	}, []);
 };
 
-console.log(v.validate(o));
-console.log(v.detail(o));
+const testRegisterFields = () => {
+	let array = ["a", "b", "c", "d", "e"];
 
-const urlRegex = /:[\w\d_]+/g;
+	let result = createRegisterFields(array, "c");
 
-function initUrls(urls) {
-  for (const key in urls) {
-    const url = urls[key];
+	return result;
+};
 
-    if (typeof url == "string") {
-      const matches = url.match(urlRegex);
+const createTest2 = (fields, id) => {
+	const idx = fields.indexOf(id);
 
-      urls[key] = {
-        base: url,
-        params: matches ? matches.map(m => m.slice(1)) : []
-      };
-      console.log(matches);
-    }
+	if (idx) {
+		fields.splice(idx, 1);
+	}
 
-    console.log(urls);
-  }
-}
-initUrls({
-  get: "/api/doc",
-  getOne: "/api/doc/:id",
-  create: "/api/doc",
-  update: "/api/doc/:id/:name/:name_second"
-});
-/*
-let a = { a: "b", c: "d" };
-console.log(a);
-console.log({ ...a });
-console.log({ a: "d", ...a });
-console.log({ ...a, a: "d" });
-console.log("Heyoo");
+	return fields;
+};
+
+const test2 = () => {
+	let array = ["a", "b", "c", "d", "e"];
+
+	let result = createTest2(array, "c");
+
+	return result;
+};
+
+console.log(testRegisterFields());
+console.log(test2());
+console.log("Original");
+console.log(await timing(testRegisterFields, 10000));
+
+console.log('IndexOf + Delete');
+console.log(await timing(test2, 10000));
+
 */

@@ -1,0 +1,12 @@
+{
+  "name": "fibo-user",
+  "type": "module",
+  "packageManager": "yarn@4.7.0",
+  "exports": {
+    ".": "./src/index.js",
+    "./browser": "./src/browser.js"
+  },
+  "dependencies": {
+    "fibo-common": "workspace:^"
+  }
+}
