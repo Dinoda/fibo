@@ -1,0 +1,13 @@
+{
+  "name": "fibo-user-jwt",
+  "type": "module",
+  "packageManager": "yarn@4.7.0",
+  "exports": {
+    ".": "./src/index.js",
+    "./server": "./src/server/index.js"
+  },
+  "dependencies": {
+    "fibo-user": "workspace:^",
+    "jsonwebtoken": "^9.0.2"
+  }
+}
