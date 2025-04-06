@@ -2,7 +2,8 @@
   "name": "fibo-database-mariadb",
   "type": "module",
   "exports": {
-    ".": "./src/index.js"
+    ".": "./src/index.js",
+    "./genesis": "./src/genesis/script.js"
   },
   "dependencies": {
     "fibo-database": "workspace:^",
