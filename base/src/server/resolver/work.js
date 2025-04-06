@@ -5,6 +5,7 @@ export const get = (req, res) => {
     workCRUD.callOperation('select', { id: req.params.id }).then((work) => {
       res.send(work);
     });
+    return;
   }
 
   workCRUD.callOperation('selectAll', {}).then((works) => {
@@ -17,6 +18,7 @@ export const post = (req, res) => {
     workCRUD.callOperation('update', req.body).then((success) => {
       res.send(success);
     });
+    return;
   }
 
   workCRUD.callOperation('insert', req.body).then((success) => {

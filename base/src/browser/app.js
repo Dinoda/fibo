@@ -6,6 +6,7 @@ const content = new Content();
 
 Window.__content.appendChild(content.getDOM());
 
+/*
 fetch('/api', {
   headers: {
     'Authorization': 'Bearer abcdefg',
@@ -13,4 +14,4 @@ fetch('/api', {
 }).then((res) => {
     console.log(res);
 });
-
+*/

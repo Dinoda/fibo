@@ -110,6 +110,9 @@ ${JSON.stringify(opeValidator.detail(ope))}`);
   }
 
   resolveFields(params, data) {
+    if (!params) {
+      return [];
+    }
     return params.map((a) => {
       return data[a];
     });

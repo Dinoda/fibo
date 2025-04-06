@@ -1,14 +1,17 @@
 import { Component  } from 'fibo-browser';
 
+const paramMatchRegex = /:(\w+)/;
+
 export default class Form extends Component {
-  constructor(method, target) {
+  constructor(method, target, callback = () => {}) {
     super('form');
 
-    this.method = method;
+    this.method = method.toUpperCase();
     this.target = target;
+    this.callback = callback;
 
-    this.on('submit', () => {
-      submit();
+    this.on('submit', (e) => {
+      this.submit(e);
     });
   }
 
@@ -25,7 +28,42 @@ export default class Form extends Component {
     this.addField('button', name, '');
   }
 
-  submit() {
+  submit(event) {
+    event.preventDefault();
 
+    const fdata = new FormData(this.__);
+
+    const data = {};
+
+    fdata.forEach((value, key) => {
+      data[key] = value;
+    });
+
+    let target = this.getTarget(data);
+
+    fetch(target, {
+      method: this.method,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }).then(this.callback);
+  }
+
+  getTarget(data) {
+    let targ = this.target;
+
+    let match = targ.match(paramMatchRegex);
+
+    while (match) {
+      if (! data[match[1]]) {
+        throw new Error(`Missing parameter: ${match[1]}`);
+      }
+      targ = targ.replace(match[0], data[match[1]]);
+
+      match = targ.match(paramMatchRegex);
+    }
+
+    return targ;
   }
 }
