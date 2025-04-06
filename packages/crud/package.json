@@ -1,0 +1,12 @@
+{
+  "name": "fibo-crud",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "dependencies": {
+    "fibo-database": "workspace:^",
+    "fibo-validate": "workspace:^"
+  },
+  "packageManager": "yarn@4.7.0"
+}
