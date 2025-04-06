@@ -100,6 +100,10 @@ export const string = elem => {
   return typeof elem === "string" || elem instanceof String;
 };
 
+export const array = elem => {
+  return Array.isArray(elem);
+};
+
 export const number = elem => {
   return elem != null && isFinite(elem);
 };
@@ -132,4 +136,10 @@ export const boolean = elem => {
 
 export const callable = elem => {
   return typeof elem == "function";
+};
+
+export const isaninstanceof = cls => {
+  return (elem) => {
+    return elem instanceof cls;
+  };
 };
