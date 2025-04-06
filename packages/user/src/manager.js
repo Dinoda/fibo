@@ -1,8 +1,9 @@
-import { Source, SourceList } from './source.js';
-import { Authenticator, AuthenticatorList } from './authenticator.js';
+import { Source } from './source.js';
+import { Authenticator } from './authenticator.js';
+import Authorization from './authorization.js';
 
 export default class UserManager {
-	constructor(source, authenticator) {
+	constructor(source, authenticator, authorization) {
 		if (source instanceof SourceList) {
 			this.sources = source;
 		} else if (source instanceof Source) {
@@ -11,28 +12,22 @@ export default class UserManager {
 			throw new Error(`First parameter "source" is expected to be a Source or SourceList`);
 		}
 
-		if (authenticator instanceof AuthenticatorList) {
-			this.authenticators = authenticator;
-		} else if (authenticator instanceof Authenticator) {
-			this.authenticators = new AuthenticatorList({def: authenticator});
+		if (auth instanceof AuthServiceList) {
+			this.auth = auth;
+		} else if (auth instanceof AuthService) {
+			this.auth = new AuthServiceList({def: auth});
 		} else {
-			throw new Error(`Second parameter "authenticator" is expected to be an Authenticator or AuthenticatorList`);
+			throw new Error(`Second parameter "auth" is expected to be an AuthService or AuthServiceList`);
 		}
 	}
 
-	async getUser(data, source = null) {
-		const src = this.getSource(source);
-
-		if (!src) {
-			throw new Error(`No known source for source id "${source}"`);
-		}
-
+	async getUser(data) {
 		if (data.id) {
 			return await this.source.getUserById(data.id);
 		} else if (data.username) {
 			return await this.source.getUserByUsername(data.username);
 		} else {
-			throw new Error("Couldn't load this user, no id or username available");
+      return await this.source.getUserBy(data);
 		}
 	}
 
@@ -42,8 +37,8 @@ export default class UserManager {
 		return user ? await this.createUser(user) : null;
 	}
 
-	async authenticate(data, authenticator = null, source = null) {
-		const auth = this.getAuthenticator(authenticator);
+	async authenticate(data, auth = null, source = null) {
+		const auth = this.getAuth(auth);
 
 		if (!auth) {
 			throw new Error(`No known authenticator for auth id "${authenticator}"`);
@@ -52,19 +47,26 @@ export default class UserManager {
 		return await auth.authenticate(await this.getUser(data));
 	}
 
-	getSources() {
-		return this.sources;
-	}
+  async authorize(user, data) {
+  }
 
-	getSource(name) {
-		return this.sources.getSource(name);
-	}
+  getSource() {
+    return this.source;
+  }
 
-	getAuthenticators() {
-		return this.authenticators;
-	}
+  getAuthenticator() {
+    return this.authenticator;
+  }
 
-	getAuthenticator(name) {
-		return this.authenticators.getAuthenticator(name);
-	}
+  getAuthorizationMiddleware() {
+    const man = this;
+    const authorization = this.authorization;
+
+    return (req, res, next) => {
+      authorization.checkAuthorization(req, res);
+
+      next();
+    };
+  }
 }
+

@@ -33,23 +33,4 @@ class Authenticator {
 	}
 }
 
-class AuthenticatorList {
-	constructor(authenticators) {
-		for (const k in authenticators) {
-			if (!(authenticators[k] instanceof Authenticator)) {
-				throw new Error(`Only authenticators are expected into the authenticator list: "${k}" is not an Authenticator`);
-			}
-		}
-		this.authenticators = authenticators;
-	}
-
-	getAuthenticator(name = null) {
-		if (!name) {
-			return this.authenticators.def;
-		}
-
-		return this.authenticators[name];
-	}
-}
-
-export { Authenticator, AuthenticatorList, AuthenticationError };
+export default Authenticator;

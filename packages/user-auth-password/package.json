@@ -1,5 +1,5 @@
 {
-  "name": "fibo-user-password",
+  "name": "fibo-user-auth-password",
   "type": "module",
   "packageManager": "yarn@4.7.0",
   "exports": {

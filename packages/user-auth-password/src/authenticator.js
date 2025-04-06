@@ -5,7 +5,7 @@ const DEFAULT_OPTIONS = {
 	saltRounds: 10,
 };
 
-export default PasswordAuthenticator extends Authenticator {
+export default class PasswordAuthenticator extends Authenticator {
 	constructor(options) {
 		super();
 
@@ -15,6 +15,9 @@ export default PasswordAuthenticator extends Authenticator {
 		};
 	}
 
+  /**
+   * @inherit
+   */
 	authenticateUser(user, data) {
 		return new Promise((res, rej) => {
 			if (!user.password) {
@@ -31,6 +34,9 @@ export default PasswordAuthenticator extends Authenticator {
 		});
 	}
 
+  /**
+   * @inherit
+   */
 	userForStorage(user, data) {
 		return new Promise((res, rej) => {
 			bcrypt.hash(data, this.options.saltRounds, (err, hash) => {

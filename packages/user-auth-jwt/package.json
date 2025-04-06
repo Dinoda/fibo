@@ -1,5 +1,5 @@
 {
-  "name": "fibo-user-jwt",
+  "name": "fibo-user-auth-jwt",
   "type": "module",
   "packageManager": "yarn@4.7.0",
   "exports": {

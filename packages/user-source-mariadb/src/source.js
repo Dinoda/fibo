@@ -1,14 +1,6 @@
 import { Source } from 'fibo-user';
-
-const removeFromArray = (arr, val) => {
-	const idx = arr.indexOf(val);
-
-	if (idx >= 0) {
-		arr.splice(idx, 1);
-	}
-
-	return arr;
-};
+import { createQuerySQL, createRegisterSQL, createUpdateSQL }from './sql.js';
+import { createRegisterFields, createUpdateFields } from './fields.js';
 
 const DEFAULT_OPTIONS = {
 	cacheDuration: 30000,
@@ -19,59 +11,11 @@ const DEFAULT_OPTIONS = {
 	id: "id"
 };
 
-const createQuerySQL = (options) => {
-	if (options.querySQL) {
-		return options.querySQL;
-	}
-
-	return `SELECT ${options.fields.join(', ')} 
-	FROM \`${options.tableName}\`
-	WHERE ${username} = ?
-	`;
-};
-
-const createRegisterSQL = (options) => {
-	if (options.registerSQL) {
-		return options.registerSQL;
-	}
-
-	return `
-		INSERT INTO \`${options.tableName}\`
-		(${options.fields.join(', ')})
-		VALUES
-		(${options.fields.map(() => "?").join(', ')})
-	`;
-};
-
-const createRegisterFields = removeFromArray;
-
-const createUpdateSQL = (options) => {
-	if (options.updateSQL) {
-		return options.updateSQL;
-	}
-
-	return `
-		UPDATE \`${options.tableName}\`
-		SET 
-			
-		WHERE ${options.username} = ?
-	`;
-};
-
-const createUpdateFields = (fields, username, id) => {
-	let flds = removeFromArray(fields, username);
-	flds = removeFromArray(fields, id);
-
-	flds.push(username);
-
-	return flds;
-};
-
 /**
  * Mariadb-powered User source
  *
- * @param database The database object (from "fibo-database-mariadb")
- * @param options The options for the source
+ * @param MariaDBDatabase database The database object (from "fibo-database-mariadb")
+ * @param Object options The options for the source
  *
  * 	- cacheDuration: Keeps the users in cache for this duration (in ms)
  *
@@ -88,7 +32,7 @@ const createUpdateFields = (fields, username, id) => {
  * 	- tableName: The name of the table this source get its users from
  * 	- username: The field used to compare with the parameter from "getUser" method
  */
-export default MariaDBUserSource extends Source {
+export default class MariaDBUserSource extends Source {
 	constructor(database, options) {
 		super();
 
@@ -120,6 +64,9 @@ export default MariaDBUserSource extends Source {
 		return users.length ? users[0] : null;
 	}
 
+  /**
+   * @inherit
+   */
 	async getUser(id) {
 		if (this.table[id]) {
 			if (this.table[id].ts > Date.now()) {
@@ -135,6 +82,9 @@ export default MariaDBUserSource extends Source {
 		return this.table[id].user;
 	}
 
+  /**
+   * @inherit
+   */
 	getSecuredUserForUser(user) {
 		for (const fld of this.options.securedFields) {
 			delete user[fld];
@@ -143,13 +93,32 @@ export default MariaDBUserSource extends Source {
 		return user;
 	}
 
-	async getSecuredUser(id) {
-		return this.getSecuredUserForUser(await this.getUser(id));
-	}
-
+  /**
+   * @inherit
+   */
 	async registerUser(user) {
+    const result = await this.database.query(this.sql.register, this.resolveFields(user, this.options.registerFields));
+
+    return result.affectedRows == 1;
 	}
 
+  /**
+   * @inherit
+   */
 	async updateUser(user) {
+    const result = await this.database.query(this.sql.update, this.resolveFields(user, this.options.updateFields));
+
+    return result.affectedRows == 1;
 	}
+
+  resolveFields(user, fieldSelection) {
+    const fields = [];
+
+    for (const fld of fieldSelection) {
+      fields.push(user[fld]);
+    }
+
+    return fields
+  }
 }
+

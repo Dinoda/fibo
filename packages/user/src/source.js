@@ -26,7 +26,7 @@ class Source {
 	 * @return The user object, without its unsecure data (e.g. password or hashed password)
 	 */
 	async getSecuredUser(id) {
-		ImplementationError.implementMethod("Source", "getSecuredUser");
+    return this.getSecuredUserForUser(await this.getUser(id));
 	}
 
 	/**
@@ -53,6 +53,7 @@ class Source {
 	 *
 	 */
 	async updateUser(user) {
+    ImplementationError.implementMethod("Source", "updateUser");
 	}
 }
 
