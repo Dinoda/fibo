@@ -1,6 +1,6 @@
 {
   "name": "fibo",
-  "packageManager": "yarn@4.7.0",
+  "packageManager": "yarn@4.8.1",
   "private": true,
   "scripts": {
     "dev": "cd base && yarn dev",
