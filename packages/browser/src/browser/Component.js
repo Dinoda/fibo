@@ -49,6 +49,8 @@ export default class Component {
     this.append(tag);
 
     this["__" + name] = tag;
+
+    return this.getChild(name);
   }
 
   /**
