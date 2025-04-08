@@ -1,10 +1,12 @@
 import { Database } from 'fibo-database';
 import Validator, { types as v } from 'fibo-validate';
+import CRUDValidationError from './exception/validationError.js';
+import CRUDError from './exception/CRUDError.js';
 
 const opeValidator = new Validator({
   sql: v.requiredAnd(v.string),
   // params: [Optional] Default to []
-  params: v.nullableOr(v.array),
+  params: v.nullableOr(v.or(v.array, v.object)),
   // hydrator: [Optional] Name of the hydrator for this operation
   // Default to option's "defaultHydrator" (or "defaultUpdateHydrator", if "select" is false)
   hydrator: v.nullableOr(v.string),
@@ -39,19 +41,17 @@ const optValidator = new Validator({
 export default class CRUD {
   constructor(database, operations, options = {}) {
     if (! (database instanceof Database)) {
-      throw new Error("database is expected to be an instance of Database");
+      throw new CRUDError("database is expected to be an instance of Database");
     }
 
     if (! optValidator.validate(options)) {
-      throw new Error(`Options are not valid:
-${JSON.stringify(optValidator.detail(options))}`);
+      throw new CRUDError(`Options are not valid`, optValidator.detail(options));
     }
 
     for (const k in operations) {
       const ope = operations[k];
       if (! opeValidator.validate(ope)) {
-        throw new Error(`Operation "${k}" is not a valid operation:
-${JSON.stringify(opeValidator.detail(ope))}`);
+        throw new CRUDError(`Operation "${k}" is not a valid operation`, opeValidator.detail(ope));
       }
     }
 
@@ -81,27 +81,28 @@ ${JSON.stringify(opeValidator.detail(ope))}`);
     const ope = this.operations[name];
 
     if (!ope) {
-      throw new Error(`Unknown operation "${name}", couldn't proceed`);
+      throw new CRUDError(`Unknown operation "${name}", couldn't proceed`);
     }
 
     const validator = this.getValidator(ope);
 
     if (!ope.select) {
       if (validator && ! validator.validate(data)) {
-        throw new Error(`Unvalid data provided for operation "${name}", failure to process operation`);
+        throw new CRUDValidationError(`Unvalid data provided for operation "${name}", failure to process operation`, validator.detail(data));
       }
     }
+
 
     const fields = this.resolveFields(ope.params, data);
 
     const result = await this.db.query(ope.sql, fields);
 
-    const hydrated = this.hydrate(ope.hydration, result, ope.select);
+    const hydrated = this.hydrate(ope.hydrator, result, ope.select);
 
     if (ope.select && validator) {
       for (const row of hydrated) {
-        if (! validator.validate(data)) {
-          throw new Error(`Hydrated data is not valid for operation "${name}", check your validator and hydrator or fix your database`);
+        if (! validator.validate(row)) {
+          throw new CRUDValidationError(`Hydrated data is not valid for operation "${name}", check your validator and hydrator or fix your database`, validator.detail(row));
         }
       }
     }
@@ -113,8 +114,28 @@ ${JSON.stringify(opeValidator.detail(ope))}`);
     if (!params) {
       return [];
     }
-    return params.map((a) => {
-      return data[a];
+
+    if (v.array(params)) {
+      return params.map((a) => {
+        return data[a];
+      });
+    }
+
+    return Object.keys(params).map((k) => {
+      const type = params[k];
+
+      switch(type) {
+        case 'number':
+          const f = parseFloat(data[k]);
+          return Number.isNaN(f) ? null : f;
+          break;
+        case 'integer': 
+          const i = parseInt(data[k]);
+          return Number.isNaN(i) ? null : i;
+          break;
+        default:
+          return data[k] ? data[k] : null;
+      }
     });
   }
 
