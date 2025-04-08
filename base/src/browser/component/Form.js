@@ -1,31 +1,68 @@
-import { Component  } from 'fibo-browser';
+import { Component } from 'fibo-browser';
+import call, { jsonCall, binaryCall } from 'fibo-browser/call';
 
 const paramMatchRegex = /:(\w+)/;
+
+const capitalize = (t) => {
+  return t.charAt(0).toUpperCase() + t.substring(1);
+};
 
 export default class Form extends Component {
   constructor(method, target, callback = () => {}) {
     super('form');
 
-    this.method = method.toUpperCase();
+    method = method.toUpperCase();
+
     this.target = target;
-    this.callback = callback;
+    if (method == "FILEPOST") {
+      this.dataType = 'form';
+      this.fetch = (url, data) => {
+        binaryCall(url, callback)(data);
+      };
+    } else if (method == "POST") {
+      this.dataType = '';
+      this.fetch = (url, data) => {
+        jsonCall(url, callback)(data);
+      };
+    } else {
+      this.dataType = '';
+      this.fetch = (url, data) => {
+        call(url, method, callback)(data);
+      };
+    }
+    this.group = 0;
 
     this.on('submit', (e) => {
       this.submit(e);
     });
   }
 
-  addField(tag, name, type = 'text') {
-    this.appendNewComponent(name, tag);
+  newFieldGroup() {
+    return this.appendNewComponent('field-group-'+this.group++, 'p');
+  }
 
-    const dom = this.getChild(name).getDOM();
+  addField(tag, name, type = 'text', inner = '') {
+    const p = this.newFieldGroup();
+
+    switch (tag) {
+      case "input":
+      case "select":
+        const label = p.appendNewComponent(name+'-label', 'label');
+        label.text = capitalize(name);
+        break;
+      default:
+    }
+
+    const fld = p.appendNewComponent(name, tag);
+    const dom = fld.getDOM();
 
     dom.name = name;
     dom.type = type;
+    fld.text = inner;
   }
 
-  addSubmitButton(name = 'submit_button') {
-    this.addField('button', name, '');
+  addSubmitButton(text, name = 'submit_button') {
+    this.addField('button', name, '', text);
   }
 
   submit(event) {
@@ -41,13 +78,20 @@ export default class Form extends Component {
 
     let target = this.getTarget(data);
 
-    fetch(target, {
-      method: this.method,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    }).then(this.callback);
+    this.fetch(target, this.getData(fdata));
+  }
+
+  getData(fdata) {
+    if (this.dataType == 'form') {
+      return fdata;
+    }
+    const data = {};
+
+    fdata.forEach((value, key) => {
+      data[key] = value;
+    });
+
+    return data;
   }
 
   getTarget(data) {

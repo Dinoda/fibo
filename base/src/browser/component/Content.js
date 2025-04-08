@@ -1,12 +1,18 @@
 import { Component } from 'fibo-browser';
 
-import Form from './Form.js';
+import Work from './Work.js';
+import Episode from './Episode.js';
+import Sound from './Sound.js';
 
 import './Content.scss';
 
-const responseDisplay = async (resp) => {
-    console.log(resp);
-    console.log(await resp.json());
+const responseDisplay = async (err, resp) => {
+  if (err) {
+    console.error(err);
+  }
+
+  console.log(resp);
+  console.log(await resp.json());
 };
 
 const selectAllForm = () => {
@@ -39,6 +45,7 @@ const insertForm = () => {
   return f;
 };
 
+
 export default class Content extends Component {
   constructor() {
     super('div');
@@ -51,8 +58,8 @@ export default class Content extends Component {
 
     this.__header.__brand.text = 'FiBo';
 
-    this.__body.appendNewComponent('selectAll', selectAllForm());
-    this.__body.appendNewComponent('select', selectForm());
-    this.__body.appendNewComponent('insert', insertForm());
+    this.__body.appendNewComponent('work_forms', new Work());
+    this.__body.appendNewComponent('episode_forms', new Episode());
+    this.__body.appendNewComponent('sound_forms', new Sound());
   }
 }

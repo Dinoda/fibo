@@ -19,7 +19,9 @@
     "fibo-server": "workspace:^",
     "fibo-setup": "workspace:^",
     "fibo-user-auth-jwt": "workspace:^",
-    "fibo-user-source-mariadb": "workspace:^"
+    "fibo-user-source-mariadb": "workspace:^",
+    "fibo-validate": "workspace:^",
+    "multer": "^1.4.5-lts.2"
   },
   "packageManager": "yarn@4.5.3"
 }

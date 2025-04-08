@@ -2,3 +2,5 @@
 logs/*
 public/*
 !public/index.html
+
+sounds/*

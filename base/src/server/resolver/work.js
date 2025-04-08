@@ -1,33 +1,25 @@
+import { resolve } from 'fibo-server';
 import workCRUD from '../model/work.crud.js';
 
 export const get = (req, res) => {
   if (req.params.id) {
-    workCRUD.callOperation('select', { id: req.params.id }).then((work) => {
-      res.send(work);
-    });
+    resolve(res, workCRUD.callOperation('select', { id: req.params.id }));
+
     return;
   }
 
-  workCRUD.callOperation('selectAll', {}).then((works) => {
-    res.send(works);
-  });
+  resolve(res, workCRUD.callOperation('selectAll', {}));
 };
 
 export const post = (req, res) => {
   if (req.params.id) {
-    workCRUD.callOperation('update', req.body).then((success) => {
-      res.send(success);
-    });
+    resolve(res, workCRUD.callOperation('update', req.body));
     return;
   }
 
-  workCRUD.callOperation('insert', req.body).then((success) => {
-    res.send(success);
-  });
+  resolve(res, workCRUD.callOperation('insert', req.body));
 };
 
 export const del = (req, res) => {
-  workCRUD.callOperation('delete', { id: req.params.id }).then((success) => {
-    res.send(success);
-  });
+  resolve(res, workCRUD.callOperation('delete', { id: req.params.id }));
 };

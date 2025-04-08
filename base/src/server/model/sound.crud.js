@@ -4,9 +4,9 @@ import Validator, { types as v } from 'fibo-validate';
 
 import database from '../service/database.js';
 
-import { SELECT_ALL, SELECT, INSERT, UPDATE, DELETE } from './work.sql.js';
+import { SELECT_ALL, SELECT, INSERT, UPDATE, DELETE } from './sound.sql.js';
 
-const crud = new CRUD(database, {
+export default new CRUD(database, {
   selectAll: {
     sql: SELECT_ALL,
     select: true,
@@ -18,30 +18,36 @@ const crud = new CRUD(database, {
   },
   insert: {
     sql: INSERT,
-    params: ['name', 'description'],
-    select: false,
+    params: {
+      name: '',
+      description: '',
+      filename: '',
+      episode: 'integer',
+    },
   },
   update: {
     sql: UPDATE,
-    params: ['name', 'description', 'id'],
-    select: false,
+    params: {
+      name: '',
+      description: '',
+      filename: '',
+      episode: 'integer',
+      id: 'integer'
+    }
   },
   delete: {
     sql: DELETE,
-    params: ['id'],
-    select: false,
-  },
+    params: ['id']
+  }
 }, {
     validators: {
       def: new Validator({
-        id: 'integer',
+        id: "integer",
         name: v.requiredAnd(v.string),
         description: 'string',
+        filename: 'string',
+        episode: v.requiredAnd(v.integer),
       }),
     },
     defaultValidator: 'def',
   });
-
-export default crud;
-
-
