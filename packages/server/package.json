@@ -6,7 +6,8 @@
   },
   "dependencies": {
     "express": "^4.21.2",
-    "fibo-common": "workspace:^"
+    "fibo-common": "workspace:^",
+    "fibo-crud": "workspace:^"
   },
   "packageManager": "yarn@4.3.1"
 }
