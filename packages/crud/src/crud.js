@@ -16,6 +16,8 @@ const opeValidator = new Validator({
   // select: [Optional] Default to "false", indicate if the operation is a "SELECT". If true, validation is processed after
   // By default, the validation operation is performed before the query
   select: v.nullableOr(v.boolean),
+  // delete: [Optional] Default to "false", indicate if the operation is a "DELETE" operation. Disabling validation.
+  delete: v.nullableOr(v.boolean),
 });
 
 const optValidator = new Validator({
@@ -86,21 +88,24 @@ export default class CRUD {
 
     const validator = this.getValidator(ope);
 
-    if (!ope.select) {
+    if (!ope.delete && !ope.select) {
       if (validator && ! validator.validate(data)) {
         throw new CRUDValidationError(`Unvalid data provided for operation "${name}", failure to process operation`, validator.detail(data));
       }
     }
 
 
+    console.log(data);
     const fields = this.resolveFields(ope.params, data);
 
+    console.log(fields);
     const result = await this.db.query(ope.sql, fields);
 
     const hydrated = this.hydrate(ope.hydrator, result, ope.select);
 
-    if (ope.select && validator) {
-      for (const row of hydrated) {
+    if (!ope.delete && ope.select && validator) {
+      const h = v.object(hydrated) ? Object.values(hydrated) : hydrated;
+      for (const row of h) {
         if (! validator.validate(row)) {
           throw new CRUDValidationError(`Hydrated data is not valid for operation "${name}", check your validator and hydrator or fix your database`, validator.detail(row));
         }
