@@ -1,0 +1,11 @@
+{
+  "name": "fibo-browser-form",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "dependencies": {
+    "fibo-browser": "workspace:^"
+  },
+  "packageManager": "yarn@4.8.1"
+}
