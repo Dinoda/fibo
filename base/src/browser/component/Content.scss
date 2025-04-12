@@ -31,6 +31,10 @@ body {
 
   section.body {
     flex: 1;
+
+    div {
+      margin: 0 0.8rem;
+    }
   }
 
   footer {
@@ -38,5 +42,4 @@ body {
     background-color: $bg1;
   }
 }
-
 

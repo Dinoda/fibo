@@ -22,6 +22,7 @@ export default new CRUD(database, {
       name: '',
       description: '',
       work: 'integer',
+      order: "integer",
     },
   },
   update: {
@@ -30,12 +31,14 @@ export default new CRUD(database, {
       name: "",
       description: "",
       work: "integer",
+      order: "integer",
       id: "integer",
     },
   },
   delete: {
     sql: DELETE, 
     params: ['id'],
+    delete: true,
   },
 }, {
     validators: {
@@ -43,6 +46,7 @@ export default new CRUD(database, {
         id: 'integer',
         name: v.requiredAnd(v.string),
         description: 'string',
+        order: "integer",
         work: 'integer'
       }),
     },

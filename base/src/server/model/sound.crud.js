@@ -4,7 +4,7 @@ import Validator, { types as v } from 'fibo-validate';
 
 import database from '../service/database.js';
 
-import { SELECT_ALL, SELECT, INSERT, UPDATE, DELETE } from './sound.sql.js';
+import { SELECT_ALL, SELECT, INSERT, UPDATE, UPDATE_NO_FILE, DELETE } from './sound.sql.js';
 
 export default new CRUD(database, {
   selectAll: {
@@ -35,9 +35,20 @@ export default new CRUD(database, {
       id: 'integer'
     }
   },
+  updateNoFile: {
+    sql: UPDATE_NO_FILE,
+    params: {
+      name: "",
+      description: "",
+      episode: "integer",
+      id: "integer",
+    },
+    validator: "noFile",
+  },
   delete: {
     sql: DELETE,
-    params: ['id']
+    params: ['id'],
+    delete: true,
   }
 }, {
     validators: {
@@ -45,7 +56,13 @@ export default new CRUD(database, {
         id: "integer",
         name: v.requiredAnd(v.string),
         description: 'string',
-        filename: 'string',
+        filename: v.requiredAnd(v.string),
+        episode: v.requiredAnd(v.integer),
+      }),
+      noFile: new Validator({
+        id: "integer",
+        name: v.requiredAnd(v.string),
+        description: 'string',
         episode: v.requiredAnd(v.integer),
       }),
     },

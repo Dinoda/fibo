@@ -12,11 +12,11 @@ export const get = (req, res) => {
 
 export const post = (req, res) => {
   if (req.params.id) {
-    resolve(res, episodeCRUD.callOperation('update', req.body));
+    resolve(res, episodeCRUD.callOperation('update', { ...req.body, id: req.params.id }));
     return;
   }
 
-  resolve(res, episodeCRUD.callOperation('insert', req.body));
+  resolve(res, episodeCRUD.callOperation('insert', { ...req.body }));
 };
 
 export const del = (req, res) => {

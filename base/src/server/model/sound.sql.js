@@ -8,6 +8,7 @@ SELECT
 FROM \`sound\`
 `;
 
+
 export const SELECT = SELECT_ALL + `
 WHERE id = ?
 `;
@@ -27,6 +28,15 @@ SET
   name = ?,
   description = ?,
   filename = ?,
+  episode = ?
+WHERE id = ?
+`;
+
+export const UPDATE_NO_FILE = `
+UPDATE \`sound\`
+SET
+  name = ?,
+  description = ?,
   episode = ?
 WHERE id = ?
 `;

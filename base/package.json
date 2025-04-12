@@ -3,16 +3,21 @@
   "type": "module",
   "scripts": {
     "dev": "ENV=dev yarn node --watch index.js",
+    "discord": "yarn node src/discord/index.js",
     "prod": "ENV=prod yarn node index.js",
     "start": "yarn node index.js",
     "genesis": "yarn node src/server/service/genesis.js"
   },
   "dependencies": {
+    "@discordjs/voice": "^0.18.0",
+    "discord.js": "^14.18.0",
     "dotenv": "^16.4.7",
     "esbuild": "^0.24.2",
     "esbuild-sass-plugin": "^3.3.1",
     "express": "^5.1.0",
+    "ffmpeg-static": "^5.2.0",
     "fibo-browser": "workspace:^",
+    "fibo-browser-form": "workspace:^",
     "fibo-crud": "workspace:^",
     "fibo-database-mariadb": "workspace:^",
     "fibo-logging": "workspace:^",
@@ -21,6 +26,7 @@
     "fibo-user-auth-jwt": "workspace:^",
     "fibo-user-source-mariadb": "workspace:^",
     "fibo-validate": "workspace:^",
+    "mime-types": "^3.0.1",
     "multer": "^1.4.5-lts.2"
   },
   "packageManager": "yarn@4.5.3"

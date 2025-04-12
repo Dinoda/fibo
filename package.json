@@ -1,9 +1,11 @@
 {
   "name": "fibo",
-  "packageManager": "yarn@4.8.1",
+  "packageManager": "yarn@4.9.1",
   "private": true,
   "scripts": {
     "dev": "cd base && yarn dev",
+    "discord": "cd base && yarn discord",
+    "genesis": "cd base && yarn genesis",
     "prod": "cd base && yarn prod",
     "start": "cd base && yarn start",
     "test": "cd packages/test && yarn start"

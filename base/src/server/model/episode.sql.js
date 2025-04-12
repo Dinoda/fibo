@@ -3,6 +3,7 @@ SELECT
   id,
   name,
   description,
+  \`order\`,
   work AS work_id
 from \`episode\`
 `;
@@ -14,8 +15,9 @@ export const INSERT = `
 INSERT INTO \`episode\` (
   name,
   description,
-  work
-) VALUES (?, ?, ?)
+  work,
+  \`order\`
+) VALUES (?, ?, ?, ?)
 `;
 
 export const UPDATE = `
@@ -23,7 +25,8 @@ UPDATE \`episode\`
 SET
   name = ?,
   description = ?,
-  work = ?
+  work = ?,
+  \`order\` = ?
 WHERE id = ?
 `;
 
