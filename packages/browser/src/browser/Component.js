@@ -9,6 +9,7 @@ export default class Component {
    * @param cls The class (className) of the Component
    */
   constructor(tag = undefined, cls = "") {
+    this.mounted = false;
     if (tag instanceof Element) {
       this.__ = tag;
     } else if (tag) {
@@ -18,6 +19,8 @@ export default class Component {
     if (this.__ && cls) {
       this.__.className = cls;
     }
+
+    this.children = {};
   }
 
   /**
@@ -37,7 +40,7 @@ export default class Component {
    *
    * @param name The name of the new component (which will be prefixed with "__")
    * @param tag Either a Component, or the tag name for the new component (using "new Component(tag, cls)")
-   * @param cls The className of the child component
+   * @param cls The className of the child component (ignored if "tag" is a Component)
    *
    * @return None
    */
@@ -49,6 +52,10 @@ export default class Component {
     this.append(tag);
 
     this["__" + name] = tag;
+
+    this.connectChild(name, tag);
+
+    tag.parent = this;
 
     return this.getChild(name);
   }
@@ -71,8 +78,39 @@ export default class Component {
       if (child) {
         child.remove();
       }
+
+      this.disconnectChild(child);
     } else {
       this.__.remove();
+    }
+  }
+
+  /**
+   *
+   */
+  disconnectChild(name) {
+    if (typeof name == "string" || name instanceof String) {
+      this.children[name] = undefined;
+      return;
+    }
+
+    for (const k in this.children) {
+      const c = this.children[k];
+
+      if (c == name) {
+        this.children[k] = undefined;
+        return;
+      }
+    }
+  }
+
+  connectChild(name, child) {
+    this.children[name] = child;
+
+    if (this.mounted && ! child.mounted) {
+      setTimeout(() => {
+        child.mount();
+      }, 0);
     }
   }
 
@@ -84,7 +122,7 @@ export default class Component {
    * @return The child component
    */
   getChild(name) {
-    return this["__" + name];
+    return this.children[name];
   }
 
   /**
@@ -102,6 +140,9 @@ export default class Component {
     }
   }
 
+  addAsChild(name, elem) {
+    this.children[name] = elem;
+  }
   /**
    * Insert this Component before the given Component.
    *
@@ -111,6 +152,9 @@ export default class Component {
    */
   insertBefore(elem) {
     if (elem instanceof Component) {
+      if (! parent) {
+        parent = elem.parent;
+      }
       elem = elem.getDOM();
     }
 
@@ -177,5 +221,27 @@ export default class Component {
    */
   get dataset() {
     return this.__.dataset;
+  }
+
+  upmount() {
+  }
+
+  downmount() {
+  }
+
+  mount() {
+    if (! this.mounted) {
+      this.downmount();
+
+      for (const c of Object.values(this.children)) {
+        if(c.mount) {
+          c.mount();
+        }
+      }
+
+      this.upmount();
+
+      this.mounted = true;
+    }
   }
 }
