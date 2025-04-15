@@ -10,19 +10,17 @@ const players = {};
 
 const kaamelodiau = {
   join: (member) => {
-    const voice = member.voice;
-    const channel = voice.channel;
-    const guild = channel.guild;
-
-    if (! connections[guild.id]) {
-      connections[guild.id] = {};
-      players[guild.id] = {};
+    if (! member || !member.voice || !member.voice.channel) {
+      return false;
     }
+
+    const channel = member.voice.channel;
+    const guild = channel.guild;
 
     const conn = joinVoiceChannel({
       channelId: channel.id,
       guildId: guild.id,
-      adapterCreator: channel.guild.voiceAdapterCreator,
+      adapterCreator: guild.voiceAdapterCreator,
     });
 
     const player = createAudioPlayer({
@@ -33,8 +31,8 @@ const kaamelodiau = {
 
     conn.subscribe(player);
 
-    connections[guild.id][channel.id] = conn;
-    players[guild.id][channel.id] = player;
+    connections[channel.id] = conn;
+    players[channel.id] = player;
 
     return true;
   },
@@ -48,16 +46,15 @@ const kaamelodiau = {
 
     const choice = randomChoice(resources);
 
-    const channel = voice.channel
+    const channel = voice.channel;
 
     return kaamelodiau.play(interaction, member, choice);
   },
   play: (interaction, member, resource) => {
     const channel = member.voice.channel;
-    const guild = channel.guild;
 
     try {
-      players[guild.id][channel.id].play(createAudioResource(resource.file));
+      players[channel.id].play(createAudioResource(resource.file));
 
       interaction.reply(resource.name);
     } catch (err) {
@@ -74,14 +71,31 @@ const kaamelodiau = {
       const channel = voice.channel;
       const guild = channel.guild;
 
-      connections[guild.id][channel.id].destroy();
-      connections[guild.id][channel.id] = undefined;
+      connections[channel.id].destroy();
+      connections[channel.id] = undefined;
 
-      players[guild.id][channel.id].stop();
-      players[guild.id][channel.id] = undefined;
+      players[channel.id].stop();
+      players[channel.id] = undefined;
     }
 
     return true;
+  },
+  checkAudioChannel: (oldVoiceState, newVoiceState, client) => {
+    // This user was in a voice channel
+    const cid = oldVoiceState.channelId;
+    if (cid) {
+      // Get the connections linked to this channel if it exists
+      const conn = connections[cid];
+
+      if (conn) {
+        const channel = client.channels.cache.get(cid);
+
+        // Check if the bot is the last remaining
+        if (channel.members.size == 1) {
+          conn.destroy();
+        }
+      }
+    }
   },
 };
 

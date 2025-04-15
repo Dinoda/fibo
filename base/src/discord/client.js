@@ -7,6 +7,10 @@ const fail = (command) => {
   throw new Error(`Failure on command "${command}"`);
 };
 
+const mocking = [
+  'Ah bah c\'est pas une flèche',
+];
+
 export default () => {
   const client = new Client({ 
     intents: [
@@ -22,12 +26,15 @@ export default () => {
   client.on(Events.InteractionCreate, async interaction => {
     //console.log('Interaction:', interaction);
 
-    console.log(interaction);
     try {
       const member = interaction.member;
-      console.log(member);
 
       if (!interaction.isChatInputCommand()) {
+        return;
+      }
+
+      if (!member || !member.voice) {
+        await interaction.reply('Et tu veux que je fasse ça où malin ?!');
         return;
       }
 
@@ -43,7 +50,7 @@ export default () => {
               "Maintenant il faut m'écouter. Parce que là j'en ai gros.",
             ]));
           } else {
-            fail("join");
+            await interaction.reply(randomChoice(mocking));
           }
           break;
         case 'l':
@@ -54,14 +61,12 @@ export default () => {
               "M'ADRESSER PAS LA PAROLE ! HERETIQUE ! DEMON !",
             ]));
           } else {
-            fail("leave");
+            await interaction.reply(randomChoice(mocking));
           }
           break;
         case 'r':
         case 'random':
-          if (! kaamelodiau.random(interaction, member)) {
-            fail("random");
-          }
+          await kaamelodiau.random(interaction, member);
           break;
       }
     } catch (err) {
@@ -70,6 +75,10 @@ export default () => {
         process.exit(0);
       });
     }
+  });
+
+  client.on(Events.VoiceStateUpdate, (oldState, newState) => {
+    kaamelodiau.checkAudioChannel(oldState, newState, client);
   });
 
   return client;
