@@ -2,9 +2,11 @@
   "name": "fibo-database",
   "type": "module",
   "exports": {
-    ".": "./src/index.js"
+    ".": "./src/index.js",
+    "./genesis": "./src/genesis/index.js"
   },
   "dependencies": {
+    "fibo-cli": "workspace:^",
     "fibo-common": "workspace:^"
   },
   "packageManager": "yarn@4.5.3"
