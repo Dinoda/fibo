@@ -1,0 +1,8 @@
+{
+  "name": "fibo-cli",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "packageManager": "yarn@4.9.1"
+}
