@@ -1,18 +1,38 @@
-import { Component, call } from 'fibo-browser';
+import { call } from 'fibo-browser';
+
+import HeightToggleableComponent from '../HeightToggleableComponent.js';
 
 import EpisodeList from './EpisodeList.js';
 import createWorkForm from './workForm.js';
 
 import createBasicCallCB from './utils/basicLoad.js';
 
-export default class WorkElement extends Component {
+export default class WorkElement extends HeightToggleableComponent {
   constructor(workList) {
-    super('div');
+    super('div', '', {
+      transition: 'height 1s ease',
+      overflow: 'hidden',
+    });
 
     this.workList = workList;
 
     this.appendNewComponent('title', 'h3');
+
+    this.__title.appendNewComponent('toggle', 'div', '', {
+      display: 'inline-block',
+      border: '1px solid black',
+      backgroundColor: 'rgba(0, 0, 0, 0.1)',
+      borderRadius: '25%',
+    });
+    this.__title.__toggle.text = "-";
+    this.__title.__toggle.on('click', () => {
+      console.log('Toggling...');
+      this.toggleHeight();
+      this.__title.__toggle.text = this.displayed ? '-' : '+';
+    });
+
     this.__title.appendNewComponent('span', 'span');
+
     this.appendNewComponent('description', 'p');
     this.appendNewComponent('episodes', new EpisodeList(this.workList));
     this.setButtons();
@@ -66,6 +86,15 @@ export default class WorkElement extends Component {
         this.workList.updateDataFor(this.data.id);
       }
     }));
+  }
+
+  upmount() {
+    const h = this.getTotalHeight();
+
+    this.setOpenHeight(h);
+    this.setClosedHeight(this.getTotalHeight(this.__title));
+
+    this.__.style.height = h + 'px';
   }
 }
 

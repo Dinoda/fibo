@@ -1,28 +1,30 @@
 import 'dotenv/config';
 
-import REST from './REST.js';
-import client from './client.js';
+import Client, { Command, killProcessOnSignal, FiboDiscordError } from 'fibo-discord';
 
-const TOKEN = process.env.DISCORD_TOKEN;
-const CLIENT_ID = process.env.DISCORD_CLIENT_ID;
+import joinCommand from './commands/Join.js';
+import randomCommand from './commands/Random.js';
 
-try {
-  await REST(TOKEN, CLIENT_ID);
-} catch(err) {
-  console.error(err);
-  process.exit(-1);
-}
+import { joinVoiceChannel } from '@discordjs/voice';
 
-const cl = client();
+killProcessOnSignal();
+killProcessOnSignal('uncaughtException');
 
-process.on('SIGINT', (sign) => {
-  console.log(sign);
-  console.log('Closing client...');
-  cl.destroy().then(() => {
-    console.log('Client closed. Terminating...');
-    process.exit(0);
-  });
-});
+const cl = new Client(process.env.DISCORD_TOKEN, process.env.DISCORD_CLIENT_ID);
 
-cl.login(TOKEN);
+cl.callCommand = async (cmd, interaction) => {
+  try {
+    await cmd.execute(cl, interaction);
+  } catch (err) {
+    if (err instanceof FiboDiscordError) {
+      await interaction.reply(`Mooordu ! Mooordu ! Mooordu !\n\n*${err.message}*`);
+    } else {
+      throw err;
+    }
+  }
+};
 
+cl.addCommand(joinCommand);
+cl.addCommand(randomCommand);
+
+cl.start();

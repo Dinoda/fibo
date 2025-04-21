@@ -742,6 +742,7 @@ __metadata:
   resolution: "base@workspace:base"
   dependencies:
     "@discordjs/voice": "npm:^0.18.0"
+    dice-coefficient: "npm:^2.1.1"
     discord.js: "npm:^14.18.0"
     dotenv: "npm:^16.4.7"
     esbuild: "npm:^0.24.2"
@@ -752,12 +753,14 @@ __metadata:
     fibo-browser-form: "workspace:^"
     fibo-crud: "workspace:^"
     fibo-database-mariadb: "workspace:^"
+    fibo-discord: "workspace:^"
     fibo-logging: "workspace:^"
     fibo-server: "workspace:^"
     fibo-setup: "workspace:^"
     fibo-user-auth-jwt: "workspace:^"
     fibo-user-source-mariadb: "workspace:^"
     fibo-validate: "workspace:^"
+    js-levenshtein: "npm:^1.1.6"
     mime-types: "npm:^3.0.1"
     multer: "npm:^1.4.5-lts.2"
   languageName: unknown
@@ -1194,6 +1197,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"dice-coefficient@npm:^2.1.1":
+  version: 2.1.1
+  resolution: "dice-coefficient@npm:2.1.1"
+  dependencies:
+    n-gram: "npm:^2.0.0"
+  bin:
+    dice-coefficient: cli.js
+  checksum: 10c0/bf30c8a3da1fbb8d7bc8454fa3cc525f8896602725227fa2b02792c64638ffb850d689ce4e412e442b677980358edc200dd56170947e6695e00dffe19bdc3f83
+  languageName: node
+  linkType: hard
+
 "discord-api-types@npm:^0.37.103, discord-api-types@npm:^0.37.114, discord-api-types@npm:^0.37.119":
   version: 0.37.120
   resolution: "discord-api-types@npm:0.37.120"
@@ -1606,6 +1620,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"fibo-cli@workspace:^, fibo-cli@workspace:packages/cli":
+  version: 0.0.0-use.local
+  resolution: "fibo-cli@workspace:packages/cli"
+  languageName: unknown
+  linkType: soft
+
 "fibo-common@workspace:^, fibo-common@workspace:packages/common":
   version: 0.0.0-use.local
   resolution: "fibo-common@workspace:packages/common"
@@ -1634,7 +1654,17 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "fibo-database@workspace:packages/database"
   dependencies:
+    fibo-cli: "workspace:^"
     fibo-common: "workspace:^"
+  languageName: unknown
+  linkType: soft
+
+"fibo-discord@workspace:^, fibo-discord@workspace:packages/discord":
+  version: 0.0.0-use.local
+  resolution: "fibo-discord@workspace:packages/discord"
+  dependencies:
+    "@discordjs/voice": "npm:^0.18.0"
+    discord.js: "npm:^14.18.0"
   languageName: unknown
   linkType: soft
 
@@ -2193,6 +2223,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"js-levenshtein@npm:^1.1.6":
+  version: 1.1.6
+  resolution: "js-levenshtein@npm:1.1.6"
+  checksum: 10c0/14045735325ea1fd87f434a74b11d8a14380f090f154747e613529c7cff68b5ee607f5230fa40665d5fb6125a3791f4c223f73b9feca754f989b059f5c05864f
+  languageName: node
+  linkType: hard
+
 "jsbn@npm:1.1.0":
   version: 1.1.0
   resolution: "jsbn@npm:1.1.0"
@@ -2652,6 +2689,13 @@ __metadata:
     type-is: "npm:^1.6.4"
     xtend: "npm:^4.0.0"
   checksum: 10c0/59c934621bde284e04e25aa35ef79f8a9ed0c2ac4c5bae4c2880670105ec1645480ae57a84ed92323b2a8d8f875ca3189ad8a18fa0ed0bdc6fd26553d9426883
+  languageName: node
+  linkType: hard
+
+"n-gram@npm:^2.0.0":
+  version: 2.0.2
+  resolution: "n-gram@npm:2.0.2"
+  checksum: 10c0/72e2cdc8c37c9253b556a0deb9cd26d5ac59a5d7a38b2d2928927e3959bc7d3cb591d766e30309a4c685dbc51330025cb30c5c6518ee516caf3318aed2635f1b
   languageName: node
   linkType: hard
 

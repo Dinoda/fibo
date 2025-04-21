@@ -1,6 +1,6 @@
 import path from 'path';
 
-import database from '../server/service/database.js';
+import database from '../../server/service/database.js';
 
 const SELECT = `
 SELECT
@@ -29,4 +29,5 @@ export default async () => {
 
   return res;
 };
+
 

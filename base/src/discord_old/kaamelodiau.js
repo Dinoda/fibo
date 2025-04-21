@@ -1,7 +1,7 @@
 import { joinVoiceChannel, createAudioPlayer, NoSubscriberBehavior, createAudioResource } from '@discordjs/voice';
 
 import randomChoice from './random.js';
-import loadResources from './audioResources.js';
+import loadResources from './kaamelodiau/resources.js';
 
 const resources = await loadResources();
 
@@ -37,6 +37,7 @@ const kaamelodiau = {
     return true;
   },
   random: (interaction, member) => {
+    console.log(interaction);
     const voice = member.voice;
 
     if (!voice) {

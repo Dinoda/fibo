@@ -8,7 +8,7 @@ export default class Component {
    * @param tag The tag name of the Component created (this.__), if given (none created if no tag is given)
    * @param cls The class (className) of the Component
    */
-  constructor(tag = undefined, cls = "") {
+  constructor(tag = undefined, cls = "", style = {}) {
     this.mounted = false;
     if (tag instanceof Element) {
       this.__ = tag;
@@ -16,8 +16,15 @@ export default class Component {
       this.__ = document.createElement(tag);
     }
 
-    if (this.__ && cls) {
-      this.__.className = cls;
+    if (this.__) {
+      if (cls) {
+        this.__.className = cls;
+      }
+
+      for (const att in style) {
+        console.log(att, ':', style[att]);
+        this.__.style[att] = style[att];
+      }
     }
 
     this.children = {};
@@ -44,9 +51,9 @@ export default class Component {
    *
    * @return None
    */
-  appendNewComponent(name, tag, cls = "") {
+  appendNewComponent(name, tag, cls = "", style = {}) {
     if (!(tag instanceof Component)) {
-      tag = new Component(tag, cls);
+      tag = new Component(tag, cls, style);
     }
 
     this.append(tag);
@@ -239,9 +246,11 @@ export default class Component {
         }
       }
 
-      this.upmount();
-
       this.mounted = true;
+
+      setTimeout(() => {
+        this.upmount();
+      }, 0);
     }
   }
 }
