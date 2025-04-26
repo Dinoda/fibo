@@ -1,11 +1,13 @@
 import 'dotenv/config';
 
 import Client, { Command, killProcessOnSignal, FiboDiscordError } from 'fibo-discord';
+import { joinVoiceChannel } from '@discordjs/voice';
 
 import joinCommand from './commands/Join.js';
 import randomCommand from './commands/Random.js';
 
-import { joinVoiceChannel } from '@discordjs/voice';
+import voiceStateCheck from './service/voiceStateCheck.js';
+
 
 killProcessOnSignal();
 killProcessOnSignal('uncaughtException');
@@ -23,6 +25,8 @@ cl.callCommand = async (cmd, interaction) => {
     }
   }
 };
+
+cl.on('VoiceStateUpdate', voiceStateCheck.bind(null, cl));
 
 cl.addCommand(joinCommand);
 cl.addCommand(randomCommand);

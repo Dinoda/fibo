@@ -37,6 +37,14 @@ export default class Client {
     Client.clients.push(this);
   }
 
+  // Standard Accessors //
+  // ================== //
+  
+  getChannel(id) {
+    console.log(this.client.channels);
+    return this.client.channels.fetch(id);
+  }
+
   // INITIALISATION METHODS //
   // ====================== //
   

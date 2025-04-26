@@ -13,6 +13,9 @@ const getPlayer = (id) => {
 };
 
 const del = (id) => {
+  vcs[id].vc.destroy();
+  vcs[id].ap.stop();
+
   vcs[id] = undefined;
 };
 
