@@ -6,7 +6,7 @@
     "discord": "yarn node src/discord/index.js",
     "prod": "ENV=prod yarn node index.js",
     "start": "yarn node index.js",
-    "genesis": "yarn node src/server/service/genesis.js"
+    "genesis": "yarn node ./genesis/index.js"
   },
   "dependencies": {
     "@discordjs/voice": "^0.18.0",
