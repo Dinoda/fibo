@@ -115,7 +115,9 @@ export default class CLI {
 
     const cfg = this.getConfigLong(arg);
 
-    if (! cfg.canHaveValue) {
+    if (cfg.canHaveValue) {
+      this.resolve(cfg, value ?? this.getValue());
+    } else {
       this.resolve(cfg, value);
     }
   }

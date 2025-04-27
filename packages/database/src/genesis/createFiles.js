@@ -1,11 +1,26 @@
 import fs from 'fs/promises';
 import path from 'path';
 
+function fill(value, length, char) {
+  value = value.toString();
+  while (value.length < length) {
+    value = char + value;
+  }
+
+  return value;
+}
+
+// Short fill
+function sf(value) {
+  return fill(value, 2, '0');
+}
+
 function getFullDate() {
   const dt = new Date();
 
-  return dt.getFullYear() + '' + (dt.getMonth() + 1) + dt.getDate() + '-' + dt.getHours() + '' + dt.getMinutes();
+  return dt.getFullYear() + '' + sf(dt.getMonth() + 1) + sf(dt.getDate(), 2, 0) + '-' + sf(dt.getHours()) + '' + sf(dt.getMinutes());
 }
+
 export default (dir, reverseDir, filename) => {
   const file = getFullDate() + (filename === true ? '.sql' : '-' + filename + '.sql');
   const proms = [];
