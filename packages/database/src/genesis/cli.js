@@ -6,6 +6,11 @@ export default new CLI([
     short: 'a',
   },
   {
+    argument: 'new',
+    short: 'n',
+    canHaveValue: true,
+  },
+  {
     argument: "reverse",
     short: "r",
     callback: (options, name, value) => {

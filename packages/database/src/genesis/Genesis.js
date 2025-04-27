@@ -1,3 +1,5 @@
+import path from 'path';
+
 import init from './init/init.js';
 import getFiles from './init/files.js';
 import getFileContent from './init/fileContent.js';
@@ -8,11 +10,14 @@ export default class Genesis {
     this.options = options;
 
     this.reverse = options.reverse;
-    this.path = options.prefix + (this.reverse ? options.reverseDir : '');
+    this.path = this.reverse ? this.getGenesisReversePath() : this.getGenesisPath();
     this.files = options.files;
 
     this.targetStatus = this.reverse ? 'reversed' : 'loaded';
   }
+
+  // Initializers //
+  // ============ //
 
   async init() {
     await init(this.db, this.options.genesisSQL);
@@ -62,13 +67,8 @@ export default class Genesis {
     }
   }
 
-  display() {
-    for (const file of this.files) {
-      const st = this.genesis[file].status;
-      const lu = this.genesis[file].last_update;
-      console.log(`Status: ${st} -- ${file} - Last update: ${lu}`);
-    }
-  }
+  // Execution //
+  // ========= //
 
   async execute(filename, force = false) {
     if (this.genesis[filename]) {
@@ -92,6 +92,28 @@ export default class Genesis {
 
   async updateGenesisTable(filename, status) {
     await this.db.query('UPDATE `genesis` SET status = ? WHERE filename = ?', [status, filename]);
+  }
+
+  // CLI //
+  // === //
+
+  display() {
+    for (const file of this.files) {
+      const st = this.genesis[file].status;
+      const lu = this.genesis[file].last_update;
+      console.log(`Status: ${st} -- ${file} - Last update: ${lu}`);
+    }
+  }
+
+  // Getters //
+  // ======= //
+  
+  getGenesisPath() {
+    return path.resolve(this.options.prefix);
+  }
+
+  getGenesisReversePath() {
+    return path.resolve(path.join(this.options.prefix, this.options.reverseDir));
   }
 }
 

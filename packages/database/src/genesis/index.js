@@ -3,6 +3,8 @@ import Genesis from './Genesis.js';
 
 import cli from './cli.js';
 
+import createNewFiles from './createFiles.js';
+
 
 const DEFAULT_OPTIONS = {
   prefix: './genesis/',
@@ -61,6 +63,10 @@ export default async (database, options) => {
         }
       }
       await end(genesis);
+    } else if (opt.new) {
+      const f = await createNewFiles(genesis.getGenesisPath(), genesis.getGenesisReversePath(), opt.new);
+
+      console.log(`Created new genesis files: ${f}`);
     } else if (parameters[0]) {
       await genesis.execute(parameters[0], opt.force);
       await end(genesis);
