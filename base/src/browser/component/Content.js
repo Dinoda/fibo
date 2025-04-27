@@ -2,15 +2,6 @@ import { Component } from 'fibo-browser';
 
 import './Content.scss';
 
-const responseDisplay = async (err, resp) => {
-  if (err) {
-    console.error(err);
-  }
-
-  console.log(resp);
-  console.log(await resp.json());
-};
-
 export default class Content extends Component {
   constructor() {
     super('div');
