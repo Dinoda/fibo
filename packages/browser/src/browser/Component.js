@@ -141,9 +141,9 @@ export default class Component {
    */
   append(child) {
     if (child instanceof Component) {
-      this.__.appendChild(child.getDOM());
+      this.getDOM().appendChild(child.getDOM());
     } else {
-      this.__.appendChild(child);
+      this.getDOM().appendChild(child);
     }
   }
 

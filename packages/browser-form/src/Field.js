@@ -105,5 +105,30 @@ export default class Field extends Component {
   getValue() {
     return this.__.value;
   }
+
+  setDisplay(display) {
+    if (! display) {
+      this.__displayDOM = display;
+    }
+    if (! (display instanceof FieldDisplay)) {
+      throw new Error('Field expect parameter for "setDisplay" to be a FieldDisplay instance');
+    }
+
+    this.display = display;
+
+    if (! this.display) {
+      delete this.__displayDOM;
+    } else {
+      this.display.updateField();
+    }
+  }
+
+  getDOM() {
+    if (this.display) {
+      this.__displayDOM;
+    }
+
+    return this.__;
+  }
 }
 
