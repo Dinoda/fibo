@@ -1,0 +1,8 @@
+{
+  "name": "fibo-html-component",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "packageManager": "yarn@4.5.3"
+}
