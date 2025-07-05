@@ -7,6 +7,10 @@ import { idMiddleware, middleware, errorHandler } from "./logging.js";
 
 import routers from './routing/routers.js';
 
+import PRBuilder from './rendering/preRendering.js';
+
+await PRBuilder();
+
 global.PROJECT_ROOT = process.argv[1].replace("index.js", "");
 
 export default {

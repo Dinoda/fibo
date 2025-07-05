@@ -5,11 +5,6 @@ import { getSimpleData, getMultipleData } from './data.js';
  * TODO: Doc
  */
 const setValue = (elem, data) => {
-  if (elem.matches('input')) {
-    elem.value = data;
-  } else {
-    elem.textContent = data;
-  }
 };
 
 /**

@@ -1,8 +1,6 @@
 import path from 'path';
 
-import init from './init/init.js';
-import getFiles from './init/files.js';
-import getFileContent from './init/fileContent.js';
+import initDatabase from './database/init.js';
 
 export default class Genesis {
   constructor(database, options) {
@@ -10,22 +8,24 @@ export default class Genesis {
     this.options = options;
 
     this.reverse = options.reverse;
-    this.path = this.reverse ? this.getGenesisReversePath() : this.getGenesisPath();
-    this.files = options.files;
+    this.genesisTable = new GenesisTable(this.db, this.tableName, this.genesisSQL);
+    this.fs = new FileSystem(options.prefix, options.reverseDir, options.files);
 
     this.targetStatus = this.reverse ? 'reversed' : 'loaded';
+
+    this.datasources = options.datasources;
   }
 
   // Initializers //
   // ============ //
 
   async init() {
-    await init(this.db, this.options.genesisSQL);
+    await initDatabase(this.db, this.options.genesisSQL);
+    await this.fs.loadFiles();
   }
 
   async load() {
     await this.loadGenesis();
-    await this.loadFiles();
 
     let reload = false;
 

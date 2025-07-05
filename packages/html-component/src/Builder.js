@@ -1,9 +1,10 @@
-import IPattern from './IPatter.js';
+import IPattern from './IPattern.js';
+import SSRPattern from './SSRPattern.js';
 
-import Component from './Component.js';
+import HTMLComponent from './Component.js';
+import Page from './Page.js';
 
-import initialize from './component/init.js';
-
+const DEFAULT_PAGE_NAME = '__default';
 /**
  * This class is simply here to manage the whole system.
  *
@@ -18,15 +19,24 @@ export default class HTMLBuilder {
 
   static createBasic(options = {}) {
     return new HTMLBuilder({ 
-      ...options,
       pattern: IPattern,
+      ...options,
     });
   }
 
   static createSimpleSSR(options = {}) {
     return new HTMLBuilder({
-      ...options,
       pattern: SSRPattern,
+      ...options,
+    });
+  }
+
+  static createSimplePR(options = {}) {
+    return new HTMLBuilder({
+      datasetClean: ['ssr'],
+      lockOn: ['client', 'ssr'],
+      pattern: SSRPattern,
+      ...options,
     });
   }
 
@@ -39,6 +49,8 @@ export default class HTMLBuilder {
    *  * {[sub]class IPattern} pattern - The pattern instance for the builder, IPattern by default, or any child class
    *  * {array|callback(Element): boolean} lockOn - Specific "lockOn" for the pattern class (default depending from the IPattern class)
    *  * {boolean} stopOnLock - If the pattern must stop on a locking element (default to true)
+   *  * {array} datasetClean - Dataset elements to clean on components (they will be removed on the resulting HTML)
+   *  * {array} attributeClean - Attributes to clean on components (they will be removed on the resulting HTML)
    */
   constructor(options = {}) {
     if (options === IPattern || options.prototype instanceof IPattern) {
@@ -49,12 +61,17 @@ export default class HTMLBuilder {
       options.pattern = IPattern;
     }
 
-    this.pattern = new options.pattern(this);
-
     this.options = options;
 
     this.pages = {};
     this.resources = {};
+
+    this.pattern = new options.pattern(this);
+
+    this.defaultCleanOptions = {
+      datasetClean: this.options.datasetClean ?? [],
+      attributeClean: this.options.attributeClean ?? [],
+    };
   }
 
   // Simple Accessor & Mutators //
@@ -69,16 +86,32 @@ export default class HTMLBuilder {
     return this.resources[id];
   }
 
+  getPage(name = null) {
+    return this.pages[name ?? DEFAULT_PAGE_NAME];
+  }
+
+  getPages() {
+    return this.pages;
+  }
+
+  // Resources //
+  // ========= //
+
   /**
    * Adds a resource to the builder
    *
    * @param {Element} node - The DOM Element to add as a resource, it will be created as a component through the pattern
-   * @param {string} id - The id of the resource in the builder, default to the node's "id" attribute
+   * @param {object} options - The options to pass the pattern for the component creation
    */
-  addResource(node, id = null) {
-    const component = new HTMLComponent(node, this);
+  addResource(node, options = {}) {
+    const component = this.pattern.createComponent(node, options);
+    console.log('Adding new resource:', component);
 
-    this.resources[id ?? component.id] = component;
+    if (! this.resources[component.id]) {
+      this.resources[component.id] = component;
+    } else {
+      console.log('Resource already loaded.');
+    }
   }
 
   /**
@@ -86,34 +119,125 @@ export default class HTMLBuilder {
    *
    * @param {Document} doc - The document to get the resources from
    */
-  addResourcesFromDocument(doc) {
+  addResourcesFromDocument(doc, options = {}) {
+    if (doc.window) {
+      doc = doc.window.document;
+    }
+
     for (const node of doc.querySelectorAll('[id]')) {
-      if (node.parentNode == doc.body || node.parentNode == doc.head) {
-        this.addResource(node);
-      }
+      this.addResourceFromDocsNode(doc, node, options);
+    }
+
+    for (const node of doc.querySelectorAll()) {
+      this.addResourceFromDocsNode(doc, node, options);
+    }
+  }
+
+  addResourceFromDocsNode(doc, node, options) {
+    if (node.parentNode == doc.body || node.parentNode == doc.head) {
+      this.addResource(node, options);
     }
   }
 
   // Pages //
   // ===== //
 
-  preparePage(name, page, options = {}) {
-    this.pages[name] = new Page(name, page, options);
+  __isValidPageName(name) {
+    return name && (typeof name === 'string' || name instanceof String);
   }
 
-  buildPage(pageName, data, options = {}) {
+  preparePage(name, page, options = {}) {
+    if (! this.__isValidPageName(name)) {
+      this.preparePage(DEFAULT_PAGE_NAME, name, page);
+      return;
+    }
+    this.pages[name] = new Page(page, this, options);
+  }
+
+  buildPage(pageName, data = {}, options = {}) {
+    if (! this.__isValidPageName(pageName)) {
+      this.buildPage(DEFAULT_PAGE_NAME, pageName, data);
+      return;
+    }
+    const page = this.pages[pageName];
+
     const buildOptions = { ...options, ...this.options };
 
-    buildOptions.type = this.type;
+    const all = page.getAllComponents();
+    for (const name in all) {
+      const { component } = all[name];
 
-    const components = page.querySelectorAll('[data-fb]')
+      const datum = component.value ? data[component.value] : data;
 
+      const builtComp = this.build(component, data, options);
+
+      page.install(name, builtComp);
+    }
   }
 
-  build(parent, component, data, options = {}) {
+  getPageComponent(pageName, componentName = null) {
+    if (! componentName) {
+      return this.getPageComponent(DEFAULT_PAGE_NAME, pageName);
+    }
 
+    return this.pages[pageName].getComponent(componentName);
+  }
+
+  getPageHTML(name, formatter = (a) => a) {
+    if (!this.__isValidPageName(name)) {
+      return this.getPageHTML(DEFAULT_PAGE_NAME, name);
+    }
+    const page = this.pages[name];
+
+    if (page) {
+      if (page.dom) {
+        return formatter(page.serialize());
+      } else {
+        return formatter('<!DOCTYPE HTML>' + page.doc.documentElement.outerHTML);
+      }
+    }
+
+    return null;
+  }
+
+  buildAll(data, options = {}) {
+    for (const page in this.pages) {
+      this.buildPage(page, data, options);
+    }
+  }
+
+  build(component, data, options = {}) {
+    if (! (component instanceof HTMLComponent)) {
+      throw new Error('You can\'t call this method with something else than a component');
+    }
+
+    return this.pattern.buildComponent(component, data, options);
   }
 
   buildComponent(componentName, data, options = {}) {
+    if (typeof componentName !== 'string' && !(componentName instanceof String)) {
+      throw new Error(`The method "buildComponent" expect a string as the componentName parameter`);
+    }
+    const component = this.getResource(componentName);
+
+    if (!component) {
+      throw new Error(`Couldn't find a component in resources id'd with the name "${componentName}"`);
+    }
+
+    return this.build(this.getResource(componentName), data, options);
+  }
+
+  // Option Specific Accessors //
+  // ====== ======== ========= //
+
+  getCleaningOptions(localOpts = {}) {
+    if (localOpts) {
+      return {
+        datasetClean: localOpts.datasetClean ?? this.defaultCleanOptions.datasetClean,
+        attributeClean: localOpts.attributeClean ?? this.defaultCleanOptions.attributeClean,
+      };
+    }
+
+    return this.defaultCleanOptions;
   }
 }

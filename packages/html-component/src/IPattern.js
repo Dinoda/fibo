@@ -1,5 +1,9 @@
 import { initializeLockOnCallback, datasetInitialization, clean } from './component/utils.js';
 
+import HTMLComponent from './Component.js';
+
+const TEXT_NODE = 3;
+
 export default class IPattern {
 
   static lockOn = [];
@@ -30,7 +34,7 @@ export default class IPattern {
   // ========= ======== //
 
   createComponent(element, options = {}) {
-    const comp = new HTMLComponent(element, this.builder);
+    const comp = new HTMLComponent(element, this.builder, options);
 
     this.initializeComponent(comp, options);
 
@@ -43,24 +47,23 @@ export default class IPattern {
     // Lock check
     if (this.lockOn(node)) {
       comp.lock = true;
+    }
 
-      // Stop on lock, automatically build in depth
-      if (this.stopOnLock) {
-        comp.deep = true;
-        return;
+    // If component not lock, or not stopping on lock
+    if (! comp.lock || ! this.stopOnLock) {
+      // Initialize the children
+      for (const child of node.childNodes) {
+        if (child.nodeType == TEXT_NODE) {
+          if (! child.textContent.match(/^[\s]*$/)) {
+            comp.children.push(child);
+          }
+        } else {
+          comp.children.push(this.createComponent(child, options));
+        }
       }
     }
 
-    // Initialize the children
-    for (const child of node.childNodes) {
-      if (child.nodeType == TEXT_NODE && child.textContent != "") {
-        component.children.push(child);
-      } else {
-        component.children.push(this.createComponent(child, options));
-      }
-    }
-
-    // This part is to do only if the element is not locked
+    // Component not locked, analyse it
     if (! comp.lock) {
       const ds = node.dataset;
 
@@ -68,6 +71,11 @@ export default class IPattern {
       if ('multiple' in ds) {
         comp.multiple = true;
         delete ds.multiple;
+      }
+
+      // Set value at "data-value" value, or "__plain" if there is no value to the attribute
+      if ('value' in ds) {
+        comp.value = ds.value ? ds.value : '__plain';
       }
 
       // Check all standard dataset to set in the component
@@ -81,29 +89,41 @@ export default class IPattern {
           throw new Error(`Callback not found on component init "${comp.callbackInit}"`);
         }
       }
-
-      // Try to clean the component for what it can
-      clean(comp);
+    } 
+    // Component locked, if the inner analysis was not done as it must stop on lock
+    else if (this.stopOnLock) {
+      // Set as deep cloning
+      comp.deep = true;
     }
+
+    // Try to clean the component for what it can
+    clean(comp, this.builder.getCleaningOptions(options));
   }
 
   // Component building //
   // ========= ======== //
 
   buildComponent(component, data, options) {
-    if (component.multiple) {
-      const element = document.createDocumentFragment();
+    try {
+      if (component.multiple) {
+        const element = document.createDocumentFragment();
 
-      data = this.getMultipleData(data);
+        data = this.getMultipleData(data);
 
-      for (const datum in data) {
-        element.appendChild(this.buildSingle(component, data, options));
+        for (const datum of data) {
+          element.appendChild(this.buildSingle(component, datum, options));
+        }
+
+        return element;
       }
 
-      return element;
-    }
+      return this.buildSingle(component, data, options);
+    } catch (err) {
+      console.error(`Error during building of component: ${component.id ?? component.sourceNode?.tagName}`);
+      console.error(component);
 
-    return this.buildSingle(component, data, options);
+      throw err;
+    }
   }
 
   buildSingle(component, data, options) {
@@ -113,17 +133,16 @@ export default class IPattern {
 
     // Component building inside
     if (component.component) {
-      const element = this.builder.buildComponent(component.component, data, options);
+      element = this.builder.buildComponent(component.component, data, options);
     }
     // Simple component
     else {
-
-      const element = this.createElement(component);
+      element = this.createElement(component);
 
       // Has children
       if (component.children.length > 0) {
         for (const child of component.children) {
-          this.buildComponent(child, data, options);
+          element.appendChild(this.buildComponent(child, data, options));
         }
       } 
       // No child
@@ -152,7 +171,11 @@ export default class IPattern {
   }
 
   resolveData(component, data) {
-    if (component.value) {
+    if (data === null || data === undefined) {
+      throw new Error(`A data is expected at every step of the component creation, got none for node "${component.sourceNode.tagName}"`);
+    }
+
+    if (component.value && component.value !== "__plain") {
       return data[component.value];
     }
 
@@ -177,6 +200,12 @@ export default class IPattern {
 
   createElement(component) {
     if (component.tag) {
+      if (component.tag.match(/^__/)) {
+        const e = document.createDocumentFragment();
+
+        return e;
+      }
+
       const e = document.createElement(component.tag);
 
       for (const attr of component.sourceNode.attributes) {

@@ -1,7 +1,7 @@
 import resolveConfig from './config.js';
 
 export default class CLI {
-  constructor(config, args) {
+  constructor(config, args, defaultOptions = {}) {
     this.config = resolveConfig(config);
     this.args = args;
     this.argsLength = args.length;
@@ -9,7 +9,7 @@ export default class CLI {
     this.node = null;
     this.script = null;
 
-    this.options = {};
+    this.options = defaultOptions;
     this.parameters = [];
 
     this.idx = 0;
@@ -26,8 +26,20 @@ export default class CLI {
     return this.parameters;
   }
 
+  getParameter(index) {
+    if (index > -1 && index < this.parameters.length) {
+      return this.parameters[index];
+    }
+
+    return null;
+  }
+
   getOptions() {
     return this.options;
+  }
+
+  getOption(name) {
+    return this.options[name] ?? null;
   }
   
   hasNext() {
@@ -136,6 +148,7 @@ export default class CLI {
   resolveShort(arg) {
     for (let i = 1;i < arg.length;i++) {
       const cfg = this.getConfigShort(arg.charAt(i));
+    console.log(cfg);
 
       if (arg.length == i + 1) {
         const value = cfg.canHaveValue ? this.getValue() : null;

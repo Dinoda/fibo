@@ -4,7 +4,13 @@ import genesis from 'fibo-database-mariadb/genesis';
 
 import database from '../src/server/service/database.js';
 
-await genesis(database);
+//import itemsData from './loadItemsData.js';
+
+await genesis(database, {
+  datasources: {
+    //items: itemsData,
+  }
+});
 
 process.exit(0);
 

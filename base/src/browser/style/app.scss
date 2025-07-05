@@ -1,11 +1,9 @@
-@use "../style/color" as *;
+@use "./color" as *;
 
 body {
   font-family: "Raleway", sans-serif;
   margin: 0;
-}
 
-#content > div {
   display: flex;
 
   flex-flow: column nowrap;
@@ -29,7 +27,7 @@ body {
     background-color: $bg1;
   }
 
-  section.body {
+  > div#body {
     flex: 1;
 
     div {

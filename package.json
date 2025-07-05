@@ -1,6 +1,6 @@
 {
   "name": "fibo",
-  "packageManager": "yarn@4.9.1",
+  "packageManager": "yarn@4.9.2",
   "private": true,
   "scripts": {
     "dev": "cd base && yarn dev",
@@ -8,7 +8,8 @@
     "genesis": "cd base && yarn genesis",
     "prod": "cd base && yarn prod",
     "start": "cd base && yarn start",
-    "test": "cd packages/test && yarn start"
+    "test": "cd packages/test && yarn start",
+    "testcsv": "cd base && yarn node test.js"
   },
   "workspaces": [
     "base",
@@ -16,5 +17,8 @@
   ],
   "devDependencies": {
     "prettier": "3.5.3"
+  },
+  "dependencies": {
+    "jsdom": "^26.1.0"
   }
 }

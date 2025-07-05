@@ -40,3 +40,4 @@ export default (dir, reverseDir, filename) => {
     return file;
   });
 };
+

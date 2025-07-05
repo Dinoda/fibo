@@ -1,3 +1,5 @@
+import HTMLComponent from '../Component.js';
+
 // Initialization function for the lockOn method of the pattern
 export const initializeLockOnCallback = (lockOn) => {
   return (element) => {
@@ -11,18 +13,24 @@ export const initializeLockOnCallback = (lockOn) => {
   };
 };
 
-const datasetToSet = ['tag', 'value', 'component', 'callback'];
+const datasetToSet = ['tag', 'component', 'callback'];
 // Set all simple dataset to the 
 export const datasetInitialization = (ds, comp) => {
   for (const [key, value] of Object.entries(ds)) {
-    if (key in datasetToSet) {
-      comp[key] = value;
+    if (datasetToSet.includes(key)) {
+      if (value) {
+        comp[key] = value;
+      } 
       delete ds[key];
     }
   }
 };
 
 const canBeCleaned = (comp) => {
+  if (! (comp instanceof HTMLComponent)) {
+    return true;
+  }
+
   if (comp.children.length > 0 
     || comp.value
     || comp.multiple 
@@ -39,16 +47,30 @@ const canBeCleaned = (comp) => {
   return true;
 };
 
-export const clean = (comp) => {
+const canAllChildBeCleaned = (comp) => {
   for (const child of comp.children) {
     if (! canBeCleaned(child)) {
-      return;
+      return false;
     }
   }
 
-  if (! comp.tag) {
-    component.children = [];
-    component.deep = true;
+  return true;
+};
+
+export const clean = (comp, options = {}) => {
+  //console.log(comp);
+  if (canAllChildBeCleaned(comp)) {
+    comp.children = [];
+    comp.deep = true;
+  }
+
+  for (const ds of options.datasetClean) {
+    //console.log('Cleaning dataset:', ds);
+    delete comp.sourceNode.dataset[ds];
+  }
+
+  for (const attr of options.attributeClean) {
+    delete comp.sourceNode.removeAttribute(attr);
   }
 };
 

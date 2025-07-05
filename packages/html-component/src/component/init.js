@@ -1,3 +1,4 @@
+/*
 const initialize = (component, options) => {
   const node = component.sourceNode;
   const builder = component.builder;
@@ -78,4 +79,4 @@ const clean = (component) => {
 };
 
 export default initialize;
-
+*/
