@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@discordjs/voice": "^0.18.0",
+    "cookie-parser": "^1.4.7",
     "dice-coefficient": "^2.1.1",
     "discord.js": "^14.18.0",
     "dotenv": "^16.4.7",

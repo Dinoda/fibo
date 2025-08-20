@@ -33,7 +33,7 @@ export default class UserManager {
 
   authenticationMiddleware() {
     return (async function (req, res, next) {
-      await this.authenticateUser(req);
+      await this.authenticateUser(req, res);
       
       next();
     }).bind(this);
@@ -45,10 +45,10 @@ export default class UserManager {
    * @param {Request} req The Express request
    * @return {Passport} The user's passport, as added to the request
    */
-  async authenticateUser(req) {
+  async authenticateUser(req, res) {
     const user = await this.source.getUser(req);
 
-    const pp = this.auth.authenticate(user, req);
+    const pp = await this.auth.authenticateUser(this, user, req, res);
 
     this.authorizer.createAuthorization(pp, req);
 

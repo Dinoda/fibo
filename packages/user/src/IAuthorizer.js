@@ -8,7 +8,7 @@ export default class IAuthorizer {
    * This constructor simply ensure you use a child class, and not directly this one.
    */
   constructor() {
-    if (this.constructor == IAuthorization) {
+    if (this.constructor == IAuthorizer) {
       ImplementationError.implementConstructor('Authorization');
     }
   }
