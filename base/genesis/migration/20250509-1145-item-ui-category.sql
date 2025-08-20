@@ -1,8 +1,0 @@
-CREATE TABLE `itemUICategory` (
-	id INTEGER PRIMARY KEY,
-	name VARCHAR(100) NOT NULL,
-	-- Image
-	icon INTEGER NOT NULL,
-	orderMinor SMALLINT NOT NULL,
-	orderMajor SMALLINT NOT NULL
-);
