@@ -6,6 +6,7 @@
   },
   "dependencies": {
     "fibo-database-mariadb": "workspace:^",
+    "fibo-html-component-ssr": "workspace:^",
     "fibo-logging": "workspace:^",
     "fibo-server": "workspace:^",
     "fibo-setup": "workspace:^",

@@ -4,7 +4,8 @@
 //import "./src/user.js";
 //import {'fibo-browser-form'
 //
-import 'fibo-jsx-html';
+//import 'fibo-jsx-html';
+import 'fibo-html-component-ssr/test';
 
 
 

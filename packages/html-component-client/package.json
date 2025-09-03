@@ -1,0 +1,11 @@
+{
+  "name": "fibo-html-component-client",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "packageManager": "yarn@4.9.2",
+  "dependencies": {
+    "fibo-html-component": "workspace:^"
+  }
+}

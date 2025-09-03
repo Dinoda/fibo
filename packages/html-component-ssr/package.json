@@ -1,0 +1,12 @@
+{
+  "name": "fibo-html-component-ssr",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js",
+    "./test": "./test/utils.js"
+  },
+  "packageManager": "yarn@4.9.2",
+  "dependencies": {
+    "fibo-html-component": "workspace:^"
+  }
+}

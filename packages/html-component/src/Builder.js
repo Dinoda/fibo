@@ -1,5 +1,4 @@
 import IPattern from './IPattern.js';
-import SSRPattern from './SSRPattern.js';
 
 import HTMLComponent from './Component.js';
 import Page from './Page.js';
