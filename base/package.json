@@ -5,6 +5,7 @@
     "dev": "ENV=dev yarn node --watch index.js",
     "discord": "yarn node src/discord/index.js",
     "prod": "ENV=prod yarn node index.js",
+    "component": "ENV=dev yarn node src/render/index.js",
     "start": "yarn node index.js",
     "genesis": "yarn node ./genesis/index.js",
     "genesis-load": "yarn node ./genesis/load.js"
@@ -25,6 +26,7 @@
     "fibo-database-mariadb": "workspace:^",
     "fibo-discord": "workspace:^",
     "fibo-html-component": "workspace:^",
+    "fibo-html-component-ssr": "workspace:^",
     "fibo-logging": "workspace:^",
     "fibo-server": "workspace:^",
     "fibo-setup": "workspace:^",

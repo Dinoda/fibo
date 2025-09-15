@@ -7,7 +7,8 @@
     "genesis": "cd base && yarn genesis",
     "prod": "cd base && yarn prod",
     "start": "cd base && yarn start",
-    "test": "cd packages/test && yarn start"
+    "test": "cd packages/test && yarn start",
+    "tmp": "cd base && yarn component"
   },
   "workspaces": [
     "base",
