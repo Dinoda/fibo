@@ -1,5 +1,6 @@
 export default class Page {
   constructor(doc, builder, options = {}) {
+    // For ease of use for client-side
     if (doc.window) {
       this.doc = doc.window.document;
       this.dom = doc;
