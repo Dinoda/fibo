@@ -1,15 +1,18 @@
+import { TEXT_NODE } from './utils.js';
+
 export default class HTMLComponent {
   constructor(node, builder, options = {}) {
     this.sourceNode = node;
     this.builder = builder;
 
+    console.log(options);
     const idt = options.identifier;
 
     if (idt) {
-      this.id = node.getAttribute(options.identifier);
+      this.id = node.getAttribute(idt);
     }
 
-    if (! this.id) {
+    if (! this.id && node.nodeType != TEXT_NODE) {
       this.id = node.id;
       node.removeAttribute('id');
     }

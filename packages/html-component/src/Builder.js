@@ -1,9 +1,20 @@
-import IPattern from './IPattern.js';
+import IInitializer from './pattern/IInitializer.js';
+import IProcessor from './pattern/IProcessor.js';
 
 import HTMLComponent from './Component.js';
 import Page from './Page.js';
 
 const DEFAULT_PAGE_NAME = '__default';
+
+const DEFAULT_OPTIONS = {
+  identifier: null,
+  initializer: IInitializer,
+  processor: IProcessor,
+  datasetClean: [],
+  attributeClean: [],
+  stopOnLock: true,
+  lockOn: [],
+};
 /**
  * This class is simply here to manage the whole system.
  *
@@ -18,14 +29,6 @@ export default class HTMLBuilder {
 
   static createBasic(options = {}) {
     return new HTMLBuilder({ 
-      pattern: IPattern,
-      ...options,
-    });
-  }
-
-  static createSimpleSSR(options = {}) {
-    return new HTMLBuilder({
-      pattern: SSRPattern,
       ...options,
     });
   }
@@ -34,7 +37,6 @@ export default class HTMLBuilder {
     return new HTMLBuilder({
       datasetClean: ['ssr'],
       lockOn: ['client', 'ssr'],
-      pattern: SSRPattern,
       ...options,
     });
   }
@@ -43,70 +45,57 @@ export default class HTMLBuilder {
    * The builder's constructor
    *
    * @constructor
-   * @param {[sub]class IPattern|object} options - The options of this builder, if IPattern, similar to { pattern: options }
-   *
-   *  * {[sub]class IPattern} pattern - The pattern instance for the builder, IPattern by default, or any child class
-   *  * {array|callback(Element): boolean} lockOn - Specific "lockOn" for the pattern class (default depending from the IPattern class)
-   *  * {boolean} stopOnLock - If the pattern must stop on a locking element (default to true)
-   *  * {array} datasetClean - Dataset elements to clean on components (they will be removed on the resulting HTML)
-   *  * {array} attributeClean - Attributes to clean on components (they will be removed on the resulting HTML)
+   * @param {Object?} options - The options of this builder, can be left empty for simple builder
+   *    - builderDataset {string} The dataset the builder will catch upon
+   *    - initializer {class IInitializer} The initializer class to use, default to the IInitializer class
+   *    - processor {class IProcessor} The processor class to use, default to the IProcessor class
+   *    - lockOn {string[]} Specific "lockOn" for the pattern class (default depending from the IPattern class)
+   *    - stopOnLock {boolean} If the pattern must stop on a locking element (default to true)
+   *    - datasetClean {string[]} Dataset elements to clean on components (they will be removed on the resulting HTML)
+   *    - attributeClean {string[]} Attributes to clean on components (they will be removed on the resulting HTML)
    */
   constructor(options = {}) {
-    if (options === IPattern || options.prototype instanceof IPattern) {
-      options = { pattern: options };
-    }
-
-    if (!options.pattern) {
-      options.pattern = IPattern;
-    }
-
-    this.options = options;
-
-    this.pages = {};
-    this.resources = {};
-
-    this.pattern = new options.pattern(this);
-
-    this.defaultCleanOptions = {
-      datasetClean: this.options.datasetClean ?? [],
-      attributeClean: this.options.attributeClean ?? [],
+    this.options = {
+      ...DEFAULT_OPTIONS,
+      ...options,
     };
+
+    this.datasetId = this.options.identifier;
+
+    this.initializer = new (this.options.initializer)(this);
+    this.processor = new (this.options.processor)(this);
+
+    this.resources = {};
+    this.pages = {};
   }
 
-  // Simple Accessor & Mutators //
-  // ====== ======== = ======== //
+  // RESOURCES //
+  // ========= //
 
   /**
    * Returns a resource for the given id
    *
    * @param {string} id - The resource's id
+   *
+   * @return {HTMLComponent} The component
    */
   getResource(id) {
     return this.resources[id];
   }
 
-  getPage(name = null) {
-    return this.pages[name ?? DEFAULT_PAGE_NAME];
-  }
-
-  getPages() {
-    return this.pages;
-  }
-
-  // Resources //
-  // ========= //
-
   /**
    * Adds a resource to the builder
    *
-   * @param {Element} node - The DOM Element to add as a resource, it will be created as a component through the pattern
-   * @param {object} options - The options to pass the pattern for the component creation
+   * @param node {Element} The DOM Element to add as a resource, it will be created as a component through the pattern
+   * @param options {Object} The options to pass the pattern for the component creation
+   * 
+   * @return -
    */
   addResource(node, options = {}) {
-    const component = this.pattern.createComponent(node, options);
-    console.log('Adding new resource:', component);
+    const component = this.initializer.createComponent(node, options);
 
-    if (! this.resources[component.id]) {
+    console.log(component);
+    if (! (component.id in this.resources)) {
       this.resources[component.id] = component;
     } else {
       console.log('Resource already loaded.');
@@ -114,9 +103,12 @@ export default class HTMLBuilder {
   }
 
   /**
-   * Adds all the direct children of the given doc's body and head part as resources (as long as they have an "id" attribute)
+   * Adds all the direct children of the given doc's body and head part as resources (as long as they have an "id" attribute as name)
    *
-   * @param {Document} doc - The document to get the resources from
+   * @param doc {Document} The document to get the resources from
+   * @param options {Object} The options
+   *
+   * @return -
    */
   addResourcesFromDocument(doc, options = {}) {
     if (doc.window) {
@@ -127,69 +119,132 @@ export default class HTMLBuilder {
       this.addResourceFromDocsNode(doc, node, options);
     }
 
-    for (const node of doc.querySelectorAll()) {
-      this.addResourceFromDocsNode(doc, node, options);
+    if (this.datasetId) {
+      for (const node of doc.querySelectorAll(`[${this.__datasetJSToHTML(this.datasetId)}]`)) {
+        this.addResourceFromDocsNode(doc, node, options);
+      }
     }
   }
 
+  addAllResourcesFromBundle(bundle, options = {}) {
+    const documents = bundle.documents;
+
+    for (const doc of Object.values(documents)) {
+      if (doc.window) {
+        this.addResourcesFromDocument(doc, options);
+      } else {
+        this.addAllResourcesFromBundle({documents: doc}, options);
+      }
+    }
+  }
+
+  /**
+   * Adds a resource from a given node from the doc.
+   * Mainly used by "addResourcesFromDocument".
+   *
+   * @param doc {Document}
+   * @param node {Element}
+   * @param options {options}
+   *
+   * @return -
+   */
   addResourceFromDocsNode(doc, node, options) {
     if (node.parentNode == doc.body || node.parentNode == doc.head) {
       this.addResource(node, options);
     }
   }
 
-  // Pages //
-  // ===== //
+  // // PAGES // //
+  // // ===== // //
 
-  __isValidPageName(name) {
-    return name && (typeof name === 'string' || name instanceof String);
+  /**
+   * Returns the id'd page.
+   *
+   * @param name {string} The page's id. Return the default one if left empty.
+   *
+   * @return {{sourceComponent: HTMLComponent, build: string?}} The asked page, combination of its source component and a build result.
+   */
+  getPage(name = null) {
+    return this.pages[name ?? DEFAULT_PAGE_NAME];
   }
 
-  preparePage(name, page, options = {}) {
-    if (! this.__isValidPageName(name)) {
-      this.preparePage(DEFAULT_PAGE_NAME, name, page);
-      return;
-    }
-    this.pages[name] = new Page(page, this, options);
+  /**
+   * Returns the whole pages object.
+   *
+   * @return {Object<Page>} The page containing object.
+   */
+  getPages() {
+    return this.pages;
   }
 
-  buildPage(pageName, data = {}, options = {}) {
-    if (! this.__isValidPageName(pageName)) {
-      this.buildPage(DEFAULT_PAGE_NAME, pageName, data);
-      return;
+  /**
+   * Creates a named page from the given component.
+   *
+   * @param name {string} The created page's name (Optional)
+   * @param component {string?} The component's name in the builder
+   */
+  createPage(name, component) {
+    // For "name" not given
+    if (! component) {
+      component = name;
+      name = DEFAULT_PAGE_NAME;
     }
-    const page = this.pages[pageName];
 
-    const buildOptions = { ...options, ...this.options };
+    this.pages[name] = new Page(name, this.getResource(component));
+  }
 
-    const all = page.getAllComponents();
-    for (const name in all) {
-      const { component } = all[name];
-
-      const datum = component.value ? data[component.value] : data;
-
-      const builtComp = this.build(component, data, options);
-
-      page.install(name, builtComp);
+  prepareAllPages(data, options = {}) {
+    for (const [name, page] of Object.entries(this.pages)) {
+      this.preparePage(page.name, data, options);
     }
   }
 
-  getPageComponent(pageName, componentName = null) {
-    if (! componentName) {
-      return this.getPageComponent(DEFAULT_PAGE_NAME, pageName);
+  /**
+   * Prepares a page, as default name if no valid name is given.
+   *
+   * @param name {string?} The page's name (optional)
+   * @param data {object} The data to create the page
+   * @param options {object} The options
+   *
+   * @return -
+   */
+  preparePage(name, data, options = {}) {
+    if (! this.__isString(name)) {
+      options = data;
+      data = name;
+      name = DEFAULT_PAGE_NAME;
     }
 
-    return this.pages[pageName].getComponent(componentName);
-  }
-
-  getPageHTML(name, formatter = (a) => a) {
-    if (!this.__isValidPageName(name)) {
-      return this.getPageHTML(DEFAULT_PAGE_NAME, name);
-    }
     const page = this.pages[name];
 
-    if (page) {
-      if (page.dom) {
+    page.setBuild(this.build(
+      page.sourceComponent, 
+      data, 
+      {
+        ...this.options,
+        ...options
+      }
+    ));
+  }
+
+  /**
+   * Get the page's HTML content, created and prepared, then formatted by the given formatter.
+   *
+   * @param name {string|function} The page's name (optional)
+   * @param formatter {function} The HTML formatter function
+   *
+   * @return {string} The page's HTML string, formatted.
+   */
+  getPageHTML(name, formatter = (a) => a) {
+    if (! this.__isString(name)) {
+      formatter = name;
+      name = DEFAULT_PAGE_NAME;
+    }
+
+    const page = this.pages[name];
+
+    if (page?.isBuilt()) {
+      if (page.build.dom) {
         return formatter(page.serialize());
       } else {
         return formatter('<!DOCTYPE HTML>' + page.doc.documentElement.outerHTML);
@@ -199,24 +254,26 @@ export default class HTMLBuilder {
     return null;
   }
 
-  buildAll(data, options = {}) {
-    for (const page in this.pages) {
-      this.buildPage(page, data, options);
-    }
-  }
+  // BUILDING //
+  // ======== //
 
+  /**
+   *
+   */
   build(component, data, options = {}) {
+    console.log(component);
     if (! (component instanceof HTMLComponent)) {
       throw new Error('You can\'t call this method with something else than a component');
     }
 
-    return this.pattern.buildComponent(component, data, options);
+    return this.processor.build(component, data, options);
   }
 
   buildComponent(componentName, data, options = {}) {
-    if (typeof componentName !== 'string' && !(componentName instanceof String)) {
+    if (! this.__isString(componentName)) {
       throw new Error(`The method "buildComponent" expect a string as the componentName parameter`);
     }
+
     const component = this.getResource(componentName);
 
     if (!component) {
@@ -226,17 +283,14 @@ export default class HTMLBuilder {
     return this.build(this.getResource(componentName), data, options);
   }
 
-  // Option Specific Accessors //
-  // ====== ======== ========= //
+  __isString(str) {
+    return (str instanceof String) || typeof str === 'string';
+  }
 
-  getCleaningOptions(localOpts = {}) {
-    if (localOpts) {
-      return {
-        datasetClean: localOpts.datasetClean ?? this.defaultCleanOptions.datasetClean,
-        attributeClean: localOpts.attributeClean ?? this.defaultCleanOptions.attributeClean,
-      };
-    }
-
-    return this.defaultCleanOptions;
+  __datasetJSToHTML(str) {
+    return 'data-' 
+      + str.replace(/[A-Z]/, (match) => {
+        return '-' + match.toLowercase();
+      });
   }
 }

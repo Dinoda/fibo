@@ -42,16 +42,28 @@ class DocumentBundle {
     this.extensions = extensions;
   }
 
+  /**
+   * Calls "resolveDirectory" on the given directory, and returns the main Promise.
+   *
+   * @param directory {string} The parent directory for all resources.
+   *
+   * @return {Promise<>} A promise resolved when the whole directory has been resolved and turned to documents (in the "documents" attribute of the bundle).
+   */
   createFromDirectory(directory) {
-    this.resolveDirectory(this.documents, directory);
+    return this.resolveDirectory(this.documents, directory);
   }
 
   /**
+   * Takes the containing object and the directory path to resolve the documents.
    *
+   * @param obj {Object} An object which will contain the resolved documents.
+   * @param filepath {string} The path to the resource directory
+   *
+   * @return {Promise<>} A promise resolved when the directory's documents are resolved.
    */
   resolveDirectory(obj, filepath) {
     return new Promise((res) => {
-      const dirName = path.basename(path);
+      const dirName = path.basename(filepath);
       const proms = [];
 
       obj[dirName] = {};
@@ -60,10 +72,10 @@ class DocumentBundle {
         for (const file of files) {
           proms.push(this.resolveFile(obj[dirName], filepath, file));
         }
-      });
 
-      Promise.all(proms).then(() => {
-        res();
+        Promise.all(proms).then(() => {
+          res();
+        });
       });
     });
   }
@@ -72,18 +84,19 @@ class DocumentBundle {
    *
    */
   resolveFile(obj, filepath, file) {
+    const fullpath = path.join(filepath, file);
     return new Promise((res) => {
-      fs.lstat(file).then((stat) => {
+      fs.lstat(fullpath).then((stat) => {
         if(stat.isDirectory()) {
           if (this.depth) {
-            this.resolveDirectory(obj, path.join(filepath, file)).then(() => res());
+            this.resolveDirectory(obj, fullpath).then(() => res());
           } else {
             res();
           }
-        } else if (extensions.includes(path.extname(file))) {
+        } else if (this.extensions.includes(path.extname(fullpath))) {
           const filename = path.basename(file);
 
-          componentDocument.createFromFile(path.join(filepath, file)).then((jsdoc) => {
+          componentDocument.createFromFile(fullpath).then((jsdoc) => {
             obj[filename] = jsdoc;
             res();
           });
@@ -98,6 +111,7 @@ class DocumentBundle {
 /**
  * @return {Promise<Array<string,JSDOM|Object>>} A promise resolving to an array, containing the filename (at 0) and the JSDOM document or object (at 1)
  */
+/*
 const resolveFile = (file, depth, extensions) => {
   return new Promise((res, rej) => {
     fs.lstat(file).then((fstat) => {
@@ -115,10 +129,12 @@ const resolveFile = (file, depth, extensions) => {
     });
   });
 };
+*/
 
 /**
  * @return {Promise<Object<JSDOM|Object>>} A promise resolving to an object containing the document by the filename, if depth, some documents can be replaced by object containing document themselves.
  */
+/*
 const resolveDirectory = (files, depth, extensions) => {
   const proms = [];
 
@@ -136,6 +152,7 @@ const resolveDirectory = (files, depth, extensions) => {
     return document;
   });
 };
+*/
 
 /**
  * Creates documents from the files present in the directory
