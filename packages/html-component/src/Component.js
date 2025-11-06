@@ -5,7 +5,6 @@ export default class HTMLComponent {
     this.sourceNode = node;
     this.builder = builder;
 
-    console.log(options);
     const idt = options.identifier;
 
     if (idt) {

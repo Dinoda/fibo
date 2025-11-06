@@ -2,12 +2,7 @@
   "name": "fibo-html-component",
   "type": "module",
   "exports": {
-    ".": "./src/index.js",
-    "./clientdoc": "./src/document/browser.js",
-    "./serverdoc": "./src/document/server.js"
+    ".": "./src/index.js"
   },
-  "packageManager": "yarn@4.5.3",
-  "peerDependencies": {
-    "jsdom": "^26.1.0"
-  }
+  "packageManager": "yarn@4.5.3"
 }

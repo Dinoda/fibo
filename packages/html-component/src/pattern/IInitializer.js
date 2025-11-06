@@ -129,7 +129,7 @@ export default class IInitializer {
       comp.deep = true;
     }
 
-    for (const ds in options.datasetClean) {
+    for (const ds of options.datasetClean) {
       delete comp.sourceNode.dataset[ds];
     }
 

@@ -10,11 +10,21 @@ const DEFAULT_OPTIONS = {
   identifier: null,
   initializer: IInitializer,
   processor: IProcessor,
-  datasetClean: [],
+  datasetClean: [
+    "tag",
+    "component",
+    "callback",
+    "layout"
+  ],
   attributeClean: [],
   stopOnLock: true,
   lockOn: [],
+  cleanIdentifier: true,
 };
+
+const DOCUMENT = typeof document === 'undefined' 
+  ? (new ((await import('jsdom')).JSDOM)()).window.document
+  : document;
 /**
  * This class is simply here to manage the whole system.
  *
@@ -46,13 +56,15 @@ export default class HTMLBuilder {
    *
    * @constructor
    * @param {Object?} options - The options of this builder, can be left empty for simple builder
-   *    - builderDataset {string} The dataset the builder will catch upon
+   *    - identifier {string} The dataset the builder will catch upon
    *    - initializer {class IInitializer} The initializer class to use, default to the IInitializer class
    *    - processor {class IProcessor} The processor class to use, default to the IProcessor class
    *    - lockOn {string[]} Specific "lockOn" for the pattern class (default depending from the IPattern class)
    *    - stopOnLock {boolean} If the pattern must stop on a locking element (default to true)
    *    - datasetClean {string[]} Dataset elements to clean on components (they will be removed on the resulting HTML)
+   *        default: ['layout', 'tag', 'component', 'callback']
    *    - attributeClean {string[]} Attributes to clean on components (they will be removed on the resulting HTML)
+   *    - cleanIdentifier {boolean} Do the builder clean all identifier dataset (default to true)
    */
   constructor(options = {}) {
     this.options = {
@@ -62,8 +74,12 @@ export default class HTMLBuilder {
 
     this.datasetId = this.options.identifier;
 
+    if (this.datasetId) {
+      this.options.datasetClean.push(this.datasetId);
+    }
+
     this.initializer = new (this.options.initializer)(this);
-    this.processor = new (this.options.processor)(this);
+    this.processor = new (this.options.processor)(this, DOCUMENT);
 
     this.resources = {};
     this.pages = {};
@@ -94,11 +110,10 @@ export default class HTMLBuilder {
   addResource(node, options = {}) {
     const component = this.initializer.createComponent(node, options);
 
-    console.log(component);
     if (! (component.id in this.resources)) {
       this.resources[component.id] = component;
     } else {
-      console.log('Resource already loaded.');
+      console.log(`Resource "${component.id}" already loaded.`);
     }
   }
 
@@ -129,7 +144,8 @@ export default class HTMLBuilder {
   addAllResourcesFromBundle(bundle, options = {}) {
     const documents = bundle.documents;
 
-    for (const doc of Object.values(documents)) {
+    for (const name in documents) {
+      const doc = documents[name];
       if (doc.window) {
         this.addResourcesFromDocument(doc, options);
       } else {
@@ -149,9 +165,7 @@ export default class HTMLBuilder {
    * @return -
    */
   addResourceFromDocsNode(doc, node, options) {
-    if (node.parentNode == doc.body || node.parentNode == doc.head) {
-      this.addResource(node, options);
-    }
+    this.addResource(node, options);
   }
 
   // // PAGES // //
@@ -247,7 +261,7 @@ export default class HTMLBuilder {
       if (page.build.dom) {
         return formatter(page.serialize());
       } else {
-        return formatter('<!DOCTYPE HTML>' + page.doc.documentElement.outerHTML);
+        return formatter('<!DOCTYPE HTML>' + page.getBuild().outerHTML);
       }
     }
 
@@ -261,7 +275,6 @@ export default class HTMLBuilder {
    *
    */
   build(component, data, options = {}) {
-    console.log(component);
     if (! (component instanceof HTMLComponent)) {
       throw new Error('You can\'t call this method with something else than a component');
     }

@@ -1,6 +1,6 @@
 {
   "name": "fibo",
-  "packageManager": "yarn@4.9.4",
+  "type": "module",
   "private": true,
   "scripts": {
     "dev": "cd base && yarn dev",
@@ -16,8 +16,5 @@
   ],
   "devDependencies": {
     "prettier": "3.5.3"
-  },
-  "dependencies": {
-    "jsdom": "^26.1.0"
   }
 }

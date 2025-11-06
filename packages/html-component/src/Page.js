@@ -12,4 +12,8 @@ export default class Page {
   setBuild(builtDocument) {
     this.build = builtDocument;
   }
+
+  getBuild() {
+    return this.build;
+  }
 }

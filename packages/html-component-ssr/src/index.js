@@ -6,6 +6,7 @@ if (typeof window != 'undefined') {
 
 export { componentDocument as Document, DocumentBundle } from './document.js';
 export { output } from './output.js';
+export { default as PageRouterBuilder } from './PageRouterBuilder.js';
 export { Builder, IInitializer, IProcessor };
 
 export default (options = {}) => {

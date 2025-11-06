@@ -1,7 +1,13 @@
+import { createRouter } from "fibo-server";
+import { PageRouterBuilder } from 'fibo-html-component-ssr';
+
 import router from './home.js';
-import pageRouter from './pages.js';
+
+const routerBld = new PageRouterBuilder('.page', createRouter());
+
+await routerBld.initialize();
 
 export default [
   router, 
-  pageRouter,
+  routerBld.getRouter(),
 ];

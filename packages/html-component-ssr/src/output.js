@@ -13,9 +13,13 @@ output.setCustomFormatter = (formatter) => {
   output.formatter = formatter;
 };
 
-output.outputPage = async (builder, pageName, data) => {
-  await builder.buildPage(pageName, data);
-  
+output.outputPage = async (builder, pageName, directory, data) => {
+  const stat = fs.lstat(directory);
+
+  await stat.catch(() => {
+    fs.mkdir(directory);
+  });
+
   await fs.writeFile(
     path.join(
       directory,

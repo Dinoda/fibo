@@ -1,22 +1,27 @@
 import express from 'express';
 
+import '../render/index.js';
+
 import cookieParser from 'cookie-parser';
 import { createExpressApp, createRouter } from "fibo-server";
-import { JWTMiddleware } from 'fibo-user-auth-jwt/server';
 
 import { idMiddleware, middleware, errorHandler } from "./logging.js";
 
 import routers from './routing/routers.js';
 
-import PRBuilder from './rendering/preRendering.js';
-
-await PRBuilder();
-
 global.PROJECT_ROOT = process.argv[1].replace("index.js", "");
 
 export default {
-  middlewares: [cookieParser, express.json(), idMiddleware, middleware, JWTMiddleware({ secret: "abcdef" })],
+  middlewares: [
+    cookieParser, 
+    express.json(), 
+    idMiddleware, 
+    middleware, 
+    //JWTMiddleware({ secret: "abcdef" })
+  ],
   routers,
-  errorHandlers: [errorHandler],
+  errorHandlers: [
+    errorHandler
+  ]
 };
 

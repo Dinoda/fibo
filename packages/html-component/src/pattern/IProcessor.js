@@ -1,7 +1,7 @@
 export default class IProcessor {
-  constructor(builder, pattern) {
+  constructor(builder, doc) {
     this.builder = builder;
-    this.pattern = pattern;
+    this.document = doc;
   }
 
   /**
@@ -16,7 +16,6 @@ export default class IProcessor {
   build(component, data, options) {
     const element = this.buildElement(component, data, options);
 
-    console.log(component);
     if (component.callback) {
       const cb = options.callbacks[component.callback];
 
@@ -46,6 +45,11 @@ export default class IProcessor {
       return layout;
     }
 
+    console.log(component);
+    console.log(element);
+    console.log(element.children[0]);
+    console.log('=== Returning Element ===');
+
     return element;
   }
 
@@ -72,7 +76,7 @@ export default class IProcessor {
    *
    */
   buildMultipleElement(component, data, options) {
-    const element = document.createDocumentFragment();
+    const element = this.document.createDocumentFragment();
 
     data = this.resolveMultipleData(data);
 
@@ -102,7 +106,9 @@ export default class IProcessor {
 
     if (component.children.length > 0) {
       for (const child of component.children) {
-        element.appendChild(this.build(child, data, options));
+        const builtChild = this.build(child, data, options);
+
+        element.appendChild(builtChild);
       }
     } else {
       if (component.value) {
@@ -117,6 +123,8 @@ export default class IProcessor {
         element.dataset[k] = v;
       }
     }
+
+    return element;
   }
 
   /**
@@ -128,16 +136,19 @@ export default class IProcessor {
    */
   createElement(component) {
     if (component.tag) {
-      if (component.tag.match(/^__/)) {
-        const e = document.createDocumentFragment();
+      const match = component.tag.match(/^__/);
+      const e = match ? this.document.createDocumentFragment() : this.document.createElement(component.tag);
 
-        return e;
+      if (!match) {
+        for (const attr of component.sourceNode.attributes) {
+          e.attributes.setNamedItem(attr.cloneNode());
+        }
       }
 
-      const e = document.createElement(component.tag);
-
-      for (const attr of component.sourceNode.attributes) {
-        e.attributes.setNamedItem(attr.cloneNode());
+      if (component.deep) {
+        for (const childNode of component.sourceNode.children) {
+          e.appendChild(childNode.cloneNode(true));
+        }
       }
 
       return e;

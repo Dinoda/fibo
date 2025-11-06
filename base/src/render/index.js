@@ -1,16 +1,20 @@
-import createBuilder, { Builder, DocumentBundle } from 'fibo-html-component-ssr';
+import createBuilder, { Builder, DocumentBundle, output } from 'fibo-html-component-ssr';
 
-const builder = createBuilder();
+const builder = createBuilder({identifier: 'fb'});
 
 const bundle = new DocumentBundle(true);
 
 await bundle.createFromDirectory("src/html");
 
-builder.addAllResourcesFromBundle(bundle, { identifier: "fb", lockOn: ['client'] });
+const layout = bundle.documents.html.resources['layout.html'];
 
-/*
+builder.addAllResourcesFromBundle(bundle, { identifier: "pr", lockOn: ['client'] });
+
 builder.createPage('index', 'index');
-builder.createPage('profile', 'profile');
+//builder.createPage('profile', 'profile');
 
 builder.prepareAllPages({}, {lockOn: ['client']})
-*/
+
+output.setFormat(false);
+
+output.outputPage(builder, 'index', '.page', {});
